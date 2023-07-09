@@ -24,7 +24,7 @@ public class PageRankServiceImpl<T extends Identifiable> implements PageRankServ
     }
 
     @Override
-    public void addAll(Iterable<T> items) {
+    public void addAll(ArrayList<T> items) {
         items.forEach(this::add);
     }
 
