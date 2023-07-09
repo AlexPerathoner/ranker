@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -81,5 +83,10 @@ public class PageRankServiceImpl<T extends Identifiable> implements PageRankServ
     @Override
     public Iterable<T> getItemsRanked(DistributionFunction distribution) {
         return null;
+    }
+
+    @Override
+    public Set<T> getNextComparison() {
+        return new HashSet<>();
     }
 }
