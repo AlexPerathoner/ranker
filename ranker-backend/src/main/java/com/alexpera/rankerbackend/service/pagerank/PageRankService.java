@@ -1,5 +1,7 @@
 package com.alexpera.rankerbackend.service.pagerank;
 
+import java.util.Set;
+
 public interface PageRankService<T extends Identifiable> {
     void add(T item);
     void addAll(Iterable<T> items);
@@ -13,4 +15,7 @@ public interface PageRankService<T extends Identifiable> {
     Iterable<T> getItems();
     Iterable<T> getItemsSorted();
     Iterable<T> getItemsRanked(DistributionFunction distribution);
+
+    Set<T> getNextComparison();
+
 }
