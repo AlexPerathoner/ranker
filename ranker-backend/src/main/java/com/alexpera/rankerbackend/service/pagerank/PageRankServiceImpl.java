@@ -9,6 +9,7 @@ import org.jgrapht.graph.DefaultEdge;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -30,19 +31,25 @@ public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
 
     @Override
     public void addLink(AnilistMedia better, AnilistMedia worse) {
+        // todo check for cycles, remove them
         graph.addEdge(worse, better);
     }
 
     @Override
     public void calculateIteration() {
-        // todo check this
+
+        HashMap<AnilistMedia, Double> newValues = new HashMap<>();
         for (AnilistMedia item : graph.vertexSet()) {
             double sum = 0;
             for (DefaultEdge edge : graph.incomingEdgesOf(item)) {
                 AnilistMedia other = graph.getEdgeSource(edge);
                 sum += other.getPageRankValue() / graph.outDegreeOf(other);
             }
-            item.setPageRankValue((1 - DAMPING_FACTOR) + DAMPING_FACTOR * sum);
+            newValues.put(item, (1 - DAMPING_FACTOR) + DAMPING_FACTOR * sum);
+        }
+
+        for (AnilistMedia item : graph.vertexSet()) {
+            item.setPageRankValue(newValues.get(item));
         }
     }
 
