@@ -1,27 +1,27 @@
 package com.alexpera.rankerbackend.service.pagerank;
 
-import org.jgrapht.graph.DefaultEdge;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public interface PageRankService<T extends Identifiable> {
-    void add(T item);
-    void addAll(ArrayList<T> items);
+    void add(String username, T item);
+    void addAll(String username, ArrayList<T> items);
 
-    void addLink(T better, T worse);
+    void addLink(String username, T better, T worse);
 
-    void calculateIteration();
+    void calculateIteration(String username);
 
 //    void importFrom(PageRankService<T> other);
 
-    Set<T> getItems();
-    List<T> getItemsSorted();
-    List<T> getItemsRanked(DistributionFunction distribution);
+    Set<T> getItems(String username);
+    List<T> getItemsSorted(String username);
+    List<T> getItemsRanked(String username, DistributionFunction distribution);
 
-    Set<T> getNextComparison();
+    Set<T> getNextComparison(String username);
 
-    Set<Edge<T>> getEdges();
+    Set<Edge<T>> getEdges(String username);
 
 }

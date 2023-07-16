@@ -14,57 +14,64 @@ import java.util.*;
 public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
     static final double DAMPING_FACTOR = 0.85;
 
-    Graph<AnilistMedia, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+    private final HashMap<String, Graph<AnilistMedia, DefaultEdge>> graph = new HashMap<>();
+
+    private Graph<AnilistMedia, DefaultEdge> getGraph(String username) {
+        if (!graph.containsKey(username)) {
+            graph.put(username, new DefaultDirectedGraph<>(DefaultEdge.class));
+        }
+        return graph.get(username);
+    }
 
     @Override
-    public void add(AnilistMedia item) {
-        if (!graph.containsVertex(item)) {
-            graph.addVertex(item);
+    public void add(String username, AnilistMedia item) {
+        if (!getGraph(username).containsVertex(item)) {
+            getGraph(username).addVertex(item);
         }
     }
 
     @Override
-    public void addAll(ArrayList<AnilistMedia> items) {
-        items.forEach(this::add);
+    public void addAll(String username, ArrayList<AnilistMedia> items) {
+        items.forEach(anilistMedia -> add(username, anilistMedia));
     }
 
     @Override
-    public void addLink(AnilistMedia better, AnilistMedia worse) {
+    public void addLink(String username, AnilistMedia better, AnilistMedia worse) {
         // todo check for cycles, remove them
-        graph.addEdge(worse, better);
+        getGraph(username).addEdge(worse, better);
     }
 
     @Override
-    public void calculateIteration() {
+    public void calculateIteration(String username) {
 
         HashMap<AnilistMedia, Double> newValues = new HashMap<>();
-        for (AnilistMedia item : graph.vertexSet()) {
+        for (AnilistMedia item : getGraph(username).vertexSet()) {
             double sum = 0;
-            for (DefaultEdge edge : graph.incomingEdgesOf(item)) {
-                AnilistMedia other = graph.getEdgeSource(edge);
-                sum += other.getPageRankValue() / graph.outDegreeOf(other);
+            for (DefaultEdge edge : getGraph(username).incomingEdgesOf(item)) {
+                AnilistMedia other = getGraph(username).getEdgeSource(edge);
+                sum += other.getPageRankValue() / getGraph(username).outDegreeOf(other);
             }
-            newValues.put(item, (1 - DAMPING_FACTOR) / graph.vertexSet().size() + DAMPING_FACTOR * sum);
+            newValues.put(item, (1 - DAMPING_FACTOR) / getGraph(username).vertexSet().size() + DAMPING_FACTOR * sum);
         }
 
-        for (AnilistMedia item : graph.vertexSet()) {
+        for (AnilistMedia item : getGraph(username).vertexSet()) {
             item.setPageRankValue(newValues.get(item));
         }
     }
 
     @Override
-    public Set<AnilistMedia> getItems() {
-        return graph.vertexSet();
+    public Set<AnilistMedia> getItems(String username) {
+        return getGraph(username).vertexSet();
     }
 
     @Override
-    public List<AnilistMedia> getItemsSorted() {
-        return graph.vertexSet().stream().sorted().toList();
+    public List<AnilistMedia> getItemsSorted(String username) {
+        return getGraph(username).vertexSet().stream().sorted().toList();
     }
 
     @Override
-    public List<AnilistMedia> getItemsRanked(DistributionFunction distribution) {
-        List<AnilistMedia> items = getItemsSorted();
+    public List<AnilistMedia> getItemsRanked(String username, DistributionFunction distribution) {
+        List<AnilistMedia> items = getItemsSorted(username);
         @AllArgsConstructor
         @Data
         class RankedAnilistMedia {
@@ -83,12 +90,12 @@ public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
     }
 
     @Override
-    public Set<AnilistMedia> getNextComparison() {
+    public Set<AnilistMedia> getNextComparison(String username) throws RuntimeException {
         // find item with lowest number of incoming or outgoing edges
         AnilistMedia minItem = null;
         int minEdges = Integer.MAX_VALUE;
-        for (AnilistMedia item : graph.vertexSet()) {
-            int edges = graph.inDegreeOf(item) + graph.outDegreeOf(item);
+        for (AnilistMedia item : getGraph(username).vertexSet()) {
+            int edges = getGraph(username).inDegreeOf(item) + getGraph(username).outDegreeOf(item);
             if (edges < minEdges) {
                 minEdges = edges;
                 minItem = item;
@@ -96,19 +103,21 @@ public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
         }
 
         // get mid item
-        List<AnilistMedia> items = getItemsSorted();
+        List<AnilistMedia> items = getItemsSorted(username);
         AnilistMedia midItem = items.get(items.size() / 2);
 
-        // todo check error
+        if (minItem == null) {
+            throw new RuntimeException("No items in graph");
+        }
         return Set.of(minItem, midItem);
     }
 
     @Override
-    public Set<Edge<AnilistMedia>> getEdges() {
-        Set<DefaultEdge> edges = graph.edgeSet();
+    public Set<Edge<AnilistMedia>> getEdges(String username) {
+        Set<DefaultEdge> edges = getGraph(username).edgeSet();
         HashSet<Edge<AnilistMedia>> result = new HashSet<>();
         for (DefaultEdge edge : edges) {
-            result.add(new Edge<>(graph.getEdgeSource(edge), graph.getEdgeTarget(edge)));
+            result.add(new Edge<>(getGraph(username).getEdgeSource(edge), getGraph(username).getEdgeTarget(edge)));
         }
         return result;
     }
