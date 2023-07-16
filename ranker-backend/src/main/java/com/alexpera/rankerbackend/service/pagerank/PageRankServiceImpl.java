@@ -1,92 +1,101 @@
 package com.alexpera.rankerbackend.service.pagerank;
 
-import com.alexpera.rankerbackend.model.PageRank;
-import com.alexpera.rankerbackend.model.PageRankItem;
-import com.alexpera.rankerbackend.model.PageRankLink;
+import com.alexpera.rankerbackend.model.anilist.AnilistMedia;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 @Component
-public class PageRankServiceImpl<T extends Identifiable> implements PageRankService<T> {
+public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
     static final double DAMPING_FACTOR = 0.85;
 
-    PageRank<T> pageRank = new PageRank<>();
+    Graph<AnilistMedia, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
 
     @Override
-    public void add(T item) {
-        pageRank.getItems().add(new PageRankItem<>(item));
+    public void add(AnilistMedia item) {
+        graph.addVertex(item);
     }
 
     @Override
-    public void addAll(ArrayList<T> items) {
+    public void addAll(ArrayList<AnilistMedia> items) {
         items.forEach(this::add);
     }
 
     @Override
-    public void addLink(T better, T worse) {
-        // todo prevent loops
-        pageRank.getLinks().add(new PageRankLink<>(new PageRankItem<>(better), new PageRankItem<>(worse)));
-    }
-
-    private Collection<PageRankItem<T>> getNodesWorseThan(PageRankItem<T> item) {
-        return pageRank.getLinks().stream()
-                .filter(link -> link.getBetter().equals(item))
-                .map(PageRankLink::getWorse)
-                .collect(Collectors.toList());
-    }
-
-    private long getNumberOfLinksFromNode(PageRankItem<T> item) {
-        return pageRank.getLinks().stream()
-                .filter(link -> link.getBetter().equals(item))
-                .count();
-    }
-
-    private double getPageRankOfNode(PageRankItem<T> item) {
-        AtomicReference<Double> accumulator = new AtomicReference<>((double) 0);
-
-        getNodesWorseThan(item).forEach(link -> {
-            accumulator.set(accumulator.get() + link.getRank() / getNumberOfLinksFromNode(link));
-        });
-
-        return (1 - DAMPING_FACTOR) / pageRank.getItems().size() + accumulator.get() * DAMPING_FACTOR;
+    public void addLink(AnilistMedia better, AnilistMedia worse) {
+        graph.addEdge(worse, better);
     }
 
     @Override
     public void calculateIteration() {
-        pageRank.getItems().forEach(item -> {
-            double pageRankValue = getPageRankOfNode(item);
-            item.setRank(pageRankValue);
-        });
+        // todo check this
+        for (AnilistMedia item : graph.vertexSet()) {
+            double sum = 0;
+            for (DefaultEdge edge : graph.incomingEdgesOf(item)) {
+                AnilistMedia other = graph.getEdgeSource(edge);
+                sum += other.getPageRankValue() / graph.outDegreeOf(other);
+            }
+            item.setPageRankValue((1 - DAMPING_FACTOR) + DAMPING_FACTOR * sum);
+        }
     }
 
     @Override
-    public void importFrom(PageRankService<T> other) {
-
+    public Set<AnilistMedia> getItems() {
+        return graph.vertexSet();
     }
 
     @Override
-    public Iterable<T> getItems() {
-        return null;
+    public List<AnilistMedia> getItemsSorted() {
+        return graph.vertexSet().stream().sorted().toList();
     }
 
     @Override
-    public Iterable<T> getItemsSorted() {
-        return null;
+    public List<AnilistMedia> getItemsRanked(DistributionFunction distribution) {
+        List<AnilistMedia> items = getItemsSorted();
+        @AllArgsConstructor
+        @Data
+        class RankedAnilistMedia {
+            AnilistMedia anilistMedia;
+            double rank;
+        }
+        List<RankedAnilistMedia> rankedItems = new ArrayList<>();
+        for (AnilistMedia item : items) {
+            double rank;
+            if (distribution == DistributionFunction.constant) {
+                rank = (items.size() - items.indexOf(item)) / (double) items.size();
+                rankedItems.add(new RankedAnilistMedia(item, rank));
+            }
+        }
+        return rankedItems.stream().sorted((a, b) -> Double.compare(b.rank, a.rank)).map(RankedAnilistMedia::getAnilistMedia).toList();
     }
 
     @Override
-    public Iterable<T> getItemsRanked(DistributionFunction distribution) {
-        return null;
+    public Set<AnilistMedia> getNextComparison() {
+        // find item with lowest number of incoming or outgoing edges
+        AnilistMedia minItem = null;
+        int minEdges = Integer.MAX_VALUE;
+        for (AnilistMedia item : graph.vertexSet()) {
+            int edges = graph.inDegreeOf(item) + graph.outDegreeOf(item);
+            if (edges < minEdges) {
+                minEdges = edges;
+                minItem = item;
+            }
+        }
+
+        // get mid item
+        List<AnilistMedia> items = getItemsSorted();
+        AnilistMedia midItem = items.get(items.size() / 2);
+
+        // todo check error
+        return Set.of(minItem, midItem);
     }
 
-    @Override
-    public Set<T> getNextComparison() {
-        return new HashSet<>();
-    }
+
 }
