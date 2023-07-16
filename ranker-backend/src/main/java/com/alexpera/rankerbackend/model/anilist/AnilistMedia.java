@@ -1,9 +1,6 @@
 package com.alexpera.rankerbackend.model.anilist;
 
-import com.alexpera.rankerbackend.service.pagerank.Identifiable;
-import com.alexpera.rankerbackend.service.pagerank.PageRanked;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,8 +1,8 @@
 package com.alexpera.rankerbackend.controller;
 
 import com.alexpera.rankerbackend.model.anilist.AnilistMedia;
-import com.alexpera.rankerbackend.service.pagerank.DistributionFunction;
-import com.alexpera.rankerbackend.service.pagerank.Edge;
+import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
+import com.alexpera.rankerbackend.model.anilist.Edge;
 import com.alexpera.rankerbackend.service.pagerank.PageRankService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;

@@ -1,4 +1,4 @@
-package com.alexpera.rankerbackend.service.pagerank;
+package com.alexpera.rankerbackend.model.anilist;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

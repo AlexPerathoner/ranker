@@ -2,10 +2,10 @@ package com.alexpera.rankerbackend.service.pagerank;
 
 import com.alexpera.rankerbackend.dao.PageRankDAO;
 import com.alexpera.rankerbackend.model.anilist.AnilistMedia;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
+import com.alexpera.rankerbackend.model.anilist.Edge;
+import com.alexpera.rankerbackend.model.anilist.RankedAnilistMedia;
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -72,12 +72,6 @@ public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
     @Override
     public List<AnilistMedia> getItemsRanked(String username, DistributionFunction distribution) {
         List<AnilistMedia> items = getItemsSorted(username);
-        @AllArgsConstructor
-        @Data
-        class RankedAnilistMedia {
-            AnilistMedia anilistMedia;
-            double rank;
-        }
         List<RankedAnilistMedia> rankedItems = new ArrayList<>();
         for (AnilistMedia item : items) {
             double rank;
@@ -86,7 +80,7 @@ public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
                 rankedItems.add(new RankedAnilistMedia(item, rank));
             }
         }
-        return rankedItems.stream().sorted((a, b) -> Double.compare(b.rank, a.rank)).map(RankedAnilistMedia::getAnilistMedia).toList();
+        return rankedItems.stream().sorted((a, b) -> Double.compare(b.getRank(), a.getRank())).map(RankedAnilistMedia::getAnilistMedia).toList();
     }
 
     @Override
