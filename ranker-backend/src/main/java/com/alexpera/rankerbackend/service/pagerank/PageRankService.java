@@ -1,5 +1,7 @@
 package com.alexpera.rankerbackend.service.pagerank;
 
+import org.jgrapht.graph.DefaultEdge;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,5 +21,7 @@ public interface PageRankService<T extends Identifiable> {
     List<T> getItemsRanked(DistributionFunction distribution);
 
     Set<T> getNextComparison();
+
+    Set<Edge<T>> getEdges();
 
 }

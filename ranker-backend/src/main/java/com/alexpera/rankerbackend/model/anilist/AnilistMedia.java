@@ -3,8 +3,11 @@ package com.alexpera.rankerbackend.model.anilist;
 import com.alexpera.rankerbackend.service.pagerank.Identifiable;
 import com.alexpera.rankerbackend.service.pagerank.PageRanked;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -16,6 +19,19 @@ public class AnilistMedia implements Identifiable, Comparable<AnilistMedia>, Pag
     @Override
     public long getId() {
         return mediaId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AnilistMedia that = (AnilistMedia) o;
+        return mediaId == that.mediaId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mediaId);
     }
 
     @Override

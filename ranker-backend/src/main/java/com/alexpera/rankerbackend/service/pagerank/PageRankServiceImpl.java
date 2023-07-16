@@ -8,10 +8,7 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
@@ -21,7 +18,9 @@ public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
 
     @Override
     public void add(AnilistMedia item) {
-        graph.addVertex(item);
+        if (!graph.containsVertex(item)) {
+            graph.addVertex(item);
+        }
     }
 
     @Override
@@ -45,7 +44,7 @@ public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
                 AnilistMedia other = graph.getEdgeSource(edge);
                 sum += other.getPageRankValue() / graph.outDegreeOf(other);
             }
-            newValues.put(item, (1 - DAMPING_FACTOR) + DAMPING_FACTOR * sum);
+            newValues.put(item, (1 - DAMPING_FACTOR) / graph.vertexSet().size() + DAMPING_FACTOR * sum);
         }
 
         for (AnilistMedia item : graph.vertexSet()) {
@@ -102,6 +101,16 @@ public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
 
         // todo check error
         return Set.of(minItem, midItem);
+    }
+
+    @Override
+    public Set<Edge<AnilistMedia>> getEdges() {
+        Set<DefaultEdge> edges = graph.edgeSet();
+        HashSet<Edge<AnilistMedia>> result = new HashSet<>();
+        for (DefaultEdge edge : edges) {
+            result.add(new Edge<>(graph.getEdgeSource(edge), graph.getEdgeTarget(edge)));
+        }
+        return result;
     }
 
 

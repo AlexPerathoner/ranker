@@ -2,6 +2,7 @@ package com.alexpera.rankerbackend.controller;
 
 import com.alexpera.rankerbackend.model.anilist.AnilistMedia;
 import com.alexpera.rankerbackend.service.pagerank.DistributionFunction;
+import com.alexpera.rankerbackend.service.pagerank.Edge;
 import com.alexpera.rankerbackend.service.pagerank.PageRankService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
@@ -10,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,9 +61,9 @@ public class PageRankController {
     }
 
     @GetMapping("/calculate-iteration")
-    public ResponseEntity<String> calculateIteration() {
+    public ResponseEntity<List<AnilistMedia>> calculateIteration() {
         pageRankService.calculateIteration();
-        return ResponseEntity.ok().body("Iteration calculated");
+        return ResponseEntity.ok().body(pageRankService.getItemsSorted());
     }
 
     @GetMapping("/save")
@@ -71,5 +71,19 @@ public class PageRankController {
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(new File("completedSeries-"+ new Date().getTime() +".json"), pageRankService.getItemsSorted());
         return ResponseEntity.ok().body("Saved");
+    }
+
+    @GetMapping("/edges-id")
+    public ResponseEntity<List<Edge<Long>>> edgesId() {
+        List<Edge<AnilistMedia>> edges = pageRankService.getEdges().stream().toList();
+
+        List<Edge<Long>> edgesId = edges.stream().map(edge -> new Edge<>(edge.getSource().getId(), edge.getTarget().getId())).toList();
+        return ResponseEntity.ok().body(edgesId);
+    }
+    @GetMapping("/edges")
+    public ResponseEntity<List<Edge<AnilistMedia>>> edges() {
+        List<Edge<AnilistMedia>> edges = pageRankService.getEdges().stream().toList();
+
+        return ResponseEntity.ok().body(edges);
     }
 }
