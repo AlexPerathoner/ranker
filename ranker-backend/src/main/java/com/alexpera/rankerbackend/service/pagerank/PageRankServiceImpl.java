@@ -1,26 +1,26 @@
 package com.alexpera.rankerbackend.service.pagerank;
 
+import com.alexpera.rankerbackend.dao.PageRankDAO;
 import com.alexpera.rankerbackend.model.anilist.AnilistMedia;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 @Component
 public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
+    @Autowired
+    PageRankDAO dao;
+
     static final double DAMPING_FACTOR = 0.85;
 
-    private final HashMap<String, Graph<AnilistMedia, DefaultEdge>> graph = new HashMap<>();
-
     private Graph<AnilistMedia, DefaultEdge> getGraph(String username) {
-        if (!graph.containsKey(username)) {
-            graph.put(username, new DefaultDirectedGraph<>(DefaultEdge.class));
-        }
-        return graph.get(username);
+        return dao.getGraph(username);
     }
 
     @Override
