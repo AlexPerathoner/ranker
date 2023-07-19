@@ -21,7 +21,6 @@ def getCompletedSeries(name, page):
         title {
           romaji
           english
-          native
           userPreferred
         },
         coverImage {

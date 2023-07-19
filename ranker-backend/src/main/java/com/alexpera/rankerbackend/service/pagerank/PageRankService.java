@@ -1,21 +1,29 @@
 package com.alexpera.rankerbackend.service.pagerank;
 
+import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
+import com.alexpera.rankerbackend.model.anilist.Edge;
+import com.alexpera.rankerbackend.model.anilist.Identifiable;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public interface PageRankService<T extends Identifiable> {
-    void add(T item);
-    void addAll(Iterable<T> items);
+    void add(String username, T item);
+    void addAll(String username, ArrayList<T> items);
 
-    void addLink(T better, T worse);
+    void addLink(String username, T better, T worse);
 
-    void calculateIteration();
+    void calculateIteration(String username);
 
-    void importFrom(PageRankService<T> other);
+//    void importFrom(PageRankService<T> other);
 
-    Iterable<T> getItems();
-    Iterable<T> getItemsSorted();
-    Iterable<T> getItemsRanked(DistributionFunction distribution);
+    Set<T> getItems(String username);
+    List<T> getItemsSorted(String username);
+    List<T> getItemsRanked(String username, DistributionFunction distribution);
 
-    Set<T> getNextComparison();
+    Set<T> getNextComparison(String username);
+
+    Set<Edge<T>> getEdges(String username);
 
 }

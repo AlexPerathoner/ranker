@@ -1,13 +1,17 @@
 package com.alexpera.rankerbackend.model.anilist;
 
-import com.alexpera.rankerbackend.service.pagerank.Identifiable;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.UUID;
+import java.util.Objects;
 
+@Getter
+@Setter
 @Data
-public class AnilistMedia implements Identifiable {
+public class AnilistMedia implements Identifiable, Comparable<AnilistMedia>, PageRanked {
     private long mediaId;
+    private double pagerankValue;
 
     @Override
     public long getId() {
@@ -15,8 +19,36 @@ public class AnilistMedia implements Identifiable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AnilistMedia that = (AnilistMedia) o;
+        return mediaId == that.mediaId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mediaId);
+    }
+
+    @Override
     public void setId(long id) {
         mediaId = id;
+    }
+
+    @Override
+    public int compareTo(AnilistMedia o) {
+        return Double.compare(pagerankValue, o.pagerankValue);
+    }
+
+    @Override
+    public double getPageRankValue() {
+        return pagerankValue;
+    }
+
+    @Override
+    public void setPageRankValue(double value) {
+        pagerankValue = value;
     }
 
     @Data

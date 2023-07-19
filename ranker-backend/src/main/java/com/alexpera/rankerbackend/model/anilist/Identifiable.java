@@ -1,6 +1,4 @@
-package com.alexpera.rankerbackend.service.pagerank;
-
-import java.util.UUID;
+package com.alexpera.rankerbackend.model.anilist;
 
 public interface Identifiable {
     long getId();
