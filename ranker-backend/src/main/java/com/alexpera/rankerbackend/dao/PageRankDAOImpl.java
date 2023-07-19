@@ -1,17 +1,12 @@
 package com.alexpera.rankerbackend.dao;
 
-import com.alexpera.rankerbackend.config.MongoDBUtil;
 import com.alexpera.rankerbackend.model.anilist.AnilistMedia;
-import com.alexpera.rankerbackend.model.anilist.Edge;
-import lombok.Getter;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 @Component
 public class PageRankDAOImpl implements PageRankDAO {
