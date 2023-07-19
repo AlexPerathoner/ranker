@@ -1,20 +1,15 @@
 # todo
 
 ## Backend
-- complete controller methods
-- finish service & component
-- add DB
+- add DB: postgresql
 - add authorization & users
-- add import of data
+- add import of data (login with anilist?)
 	- add graphql query
 	- save results to DB
 	- use DB if data is present, else load data
 		- handle response with frontend
-- export all items with the given function
-- create methods to request next comparison
-	- binary search?
-	- when stop? If equal? Or add some more?
-	- should 
+- fix pagerank
+- add 
 
 ## Frontend
 - everything
