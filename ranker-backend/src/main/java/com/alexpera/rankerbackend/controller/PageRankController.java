@@ -39,6 +39,12 @@ public class PageRankController {
         return ResponseEntity.ok().body(pageRankService.getItemsSorted(username));
     }
 
+    @GetMapping("/load-series")
+    public ResponseEntity loadSeries(@RequestParam String username) {
+        return ResponseEntity.ok().build();
+    }
+
+
     @GetMapping("/get-items-ranked")
     public ResponseEntity<List<AnilistMedia>> getItemsRanked(@RequestParam String username) {
         return ResponseEntity.ok().body(pageRankService.getItemsRanked(username, DistributionFunction.constant));
