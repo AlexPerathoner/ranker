@@ -8,6 +8,7 @@
 <style>
     body {
         font-family: Arial, sans-serif;
+        background-color: aliceblue;
     }
 
     h1 {
@@ -16,6 +17,11 @@
     }
 
     label {
+        font-family: Bahnschrift,serif;
+        font-size: 20px;
+    }
+
+    p {
         font-family: Bahnschrift,serif;
         font-size: 20px;
     }
@@ -35,15 +41,24 @@
         outline: none;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
+
+    .imm-container{
+        margin-left: auto;
+        margin-right: auto;
+        padding-top: 150px;
+    }
 </style>
 <body>
-    <div style="text-align: center; padding-top: 250px;">
-    <h1>RANKER MASTER</h1>
+    <div style="text-align: center; padding-top: 200px;" id="form-container">
+        <h1>RANKER FOR ANILIST</h1>
         <form>
             <label>Nickname Anilist:</label><br>
             <input type="text" id="nick" name="fname"><br><br>
             <input type="button" value="Cerca" onclick=inviaNick()>
         </form>
+    </div>
+    <div style="text-align: center; padding-top: 260px; display: none" id="imm-container">
+        <IMG class='imm' SRC="https://media0.giphy.com/media/IizHZy80WZbkmHiaVP/200w.gif?cid=82a1493b15h58lah53c8frjw175z9nvi920az39wvucfwhiv&ep=v1_gifs_search&rid=200w.gif&ct=s"> <p class='imm'>Loading ur bad taste...</p>
     </div>
 </body>
 </html>
