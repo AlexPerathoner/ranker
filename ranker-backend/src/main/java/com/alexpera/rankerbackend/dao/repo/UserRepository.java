@@ -1,6 +1,7 @@
-package com.alexpera.rankerbackend.dao.model;
+package com.alexpera.rankerbackend.dao.repo;
 
 
+import com.alexpera.rankerbackend.dao.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 

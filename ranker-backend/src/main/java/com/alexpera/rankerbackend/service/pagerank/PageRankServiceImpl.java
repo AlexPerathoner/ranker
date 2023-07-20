@@ -1,11 +1,14 @@
 package com.alexpera.rankerbackend.service.pagerank;
 
-import com.alexpera.rankerbackend.dao.PageRankDAO;
+import com.alexpera.rankerbackend.dao.model.Media;
+import com.alexpera.rankerbackend.dao.repo.EdgeRepository;
+import com.alexpera.rankerbackend.dao.repo.UserRepository;
 import com.alexpera.rankerbackend.model.anilist.AnilistMedia;
 import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
 import com.alexpera.rankerbackend.model.anilist.Edge;
 import com.alexpera.rankerbackend.model.anilist.RankedAnilistMedia;
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,28 +18,35 @@ import java.util.*;
 @Component
 public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
     @Autowired
-    PageRankDAO dao;
+    UserRepository userRepository;
+    @Autowired
+    EdgeRepository edgeRepository;
+
+    private final HashMap<String, Graph<Media, DefaultEdge>> usersGraph = new HashMap<>();
 
     static final double DAMPING_FACTOR = 0.85;
 
-    private Graph<AnilistMedia, DefaultEdge> getGraph(String username) {
-        return dao.getGraph(username);
+     private Graph<Media, DefaultEdge> getGraph(String username) {
+        if (!usersGraph.containsKey(username)) {
+            usersGraph.put(username, new DefaultDirectedGraph<>(DefaultEdge.class));
+        }
+        return usersGraph.get(username);
     }
 
     @Override
-    public void add(String username, AnilistMedia item) {
+    public void add(String username, Media item) {
         if (!getGraph(username).containsVertex(item)) {
             getGraph(username).addVertex(item);
         }
     }
 
     @Override
-    public void addAll(String username, ArrayList<AnilistMedia> items) {
+    public void addAll(String username, ArrayList<Media> items) {
         items.forEach(anilistMedia -> add(username, anilistMedia));
     }
 
     @Override
-    public void addLink(String username, AnilistMedia better, AnilistMedia worse) {
+    public void addLink(String username, Media better, Media worse) {
         // todo check for cycles, remove them
         getGraph(username).addEdge(worse, better);
     }
@@ -45,16 +55,16 @@ public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
     public void calculateIteration(String username) {
 
         HashMap<AnilistMedia, Double> newValues = new HashMap<>();
-        for (AnilistMedia item : getGraph(username).vertexSet()) {
+        for (Media item : getGraph(username).vertexSet()) {
             double sum = 0;
             for (DefaultEdge edge : getGraph(username).incomingEdgesOf(item)) {
-                AnilistMedia other = getGraph(username).getEdgeSource(edge);
+                Media other = getGraph(username).getEdgeSource(edge);
                 sum += other.getPageRankValue() / getGraph(username).outDegreeOf(other);
             }
             newValues.put(item, (1 - DAMPING_FACTOR) / getGraph(username).vertexSet().size() + DAMPING_FACTOR * sum);
         }
 
-        for (AnilistMedia item : getGraph(username).vertexSet()) {
+        for (Media item : getGraph(username).vertexSet()) {
             item.setPageRankValue(newValues.get(item));
         }
     }
@@ -114,6 +124,20 @@ public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
             result.add(new Edge<>(getGraph(username).getEdgeSource(edge), getGraph(username).getEdgeTarget(edge)));
         }
         return result;
+    }
+
+    @Override
+    public void loadUser(String username) {
+        if (usersGraph.containsKey(username)) {
+         return;
+        }
+        // todo load from db
+        // load from anilist, too
+
+        Graph<Media, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+        userRepository.findById(username).getMedias().forEach(graph::addVertex);
+        edgeRepository.findByUsername(username).forEach(edge -> graph.addEdge(edge.getBetter(), edge.getWorse()));
+        usersGraph.put(username, graph);
     }
 
 

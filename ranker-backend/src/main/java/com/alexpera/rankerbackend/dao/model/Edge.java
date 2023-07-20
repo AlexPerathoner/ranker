@@ -15,13 +15,14 @@ import java.util.Set;
 @Entity
 @Table(name = "edges")
 public class Edge {
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "better_id")
-    private Set<Media> better;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToOne
+    @JoinColumn(name = "better_id")
+    private Media better;
+
+    @ManyToOne
     @JoinColumn(name = "worse_id")
-    private Set<Media> worse;
+    private Media worse;
 
     @Id
     @JoinColumn(name = "username")

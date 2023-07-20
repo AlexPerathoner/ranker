@@ -1,7 +1,7 @@
 package com.alexpera.rankerbackend.controller;
 
 import com.alexpera.rankerbackend.dao.model.Media;
-import com.alexpera.rankerbackend.dao.model.UserRepository;
+import com.alexpera.rankerbackend.dao.repo.UserRepository;
 import com.alexpera.rankerbackend.model.anilist.AnilistMedia;
 import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
 import com.alexpera.rankerbackend.model.anilist.Edge;
@@ -27,9 +27,13 @@ public class PageRankController {
     @Autowired
     PageRankService<AnilistMedia> pageRankService;
 
+//    @GetMapping("/load-user")
+//    public ResponseEntity loadUser(@RequestParam String username) {
+//        return ResponseEntity.ok().body(pageRankService.loadUser(username));
+//    }
     @GetMapping("/test-repo")
     public ResponseEntity<Set<Media>> testRepo() {
-        return ResponseEntity.ok().body(userRepository.findById("Piede").getSeries());
+        return ResponseEntity.ok().body(userRepository.findById("Piede").getMedias());
     }
 
     @GetMapping("/load-file")

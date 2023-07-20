@@ -26,4 +26,6 @@ public interface PageRankService<T extends Identifiable> {
 
     Set<Edge<T>> getEdges(String username);
 
+    void loadUser(String username);
+
 }

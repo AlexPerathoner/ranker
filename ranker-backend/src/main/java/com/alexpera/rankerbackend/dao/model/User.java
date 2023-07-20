@@ -22,6 +22,6 @@ public class User {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_medias",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "media_id"))
-    private Set<Media> series;
+            inverseJoinColumns = @JoinColumn(name = "media_id")) // todo find way to add pagerank_value numeric(12, 11),
+    private Set<Media> medias;
 }
