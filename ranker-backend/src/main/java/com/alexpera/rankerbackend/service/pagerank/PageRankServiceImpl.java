@@ -132,7 +132,7 @@ public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
          return;
         }
         // todo load from db
-        // load from anilist, too
+        // load from anilist, too 
 
         Graph<Media, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
         userRepository.findById(username).getMedias().forEach(graph::addVertex);
