@@ -22,6 +22,7 @@ public class PageRankDAOImpl implements PageRankDAO {
     /*public List<T> getAll() {
         return collection.find().into(new ArrayList<>());
     }*/
+
     private final HashMap<String, Graph<AnilistMedia, DefaultEdge>> graph = new HashMap<>();
 
     @Override
