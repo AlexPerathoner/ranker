@@ -3,42 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="style.css" />
 </head>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: aliceblue;
-    }
-
-    h1 {
-        font-size: 100px;
-        color: cornflowerblue;
-        text-align: center;
-        padding-top: 100px;
-    }
-
-    label {
-        font-family: Bahnschrift,serif;
-        font-size: 20px;
-    }
-
-    input {
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        font-size: 16px;
-        color: #333;
-        background-color: #f8f8f8;
-        transition: box-shadow 0.3s ease;
-    }
-
-    input:focus {
-        outline: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-</style>
 <body>
-<h1>PAGINA SERIE</h1>
+    <div style="text-align: center; padding-top: 100px;" id="anime-container">
+        <h1>SERIES CHOICES</h1>
+        <script>window.onload = function() {
+            loadSeries();
+        };</script>
+        <form>
+            <label>Nickname Anilist:</label><br>
+
+            <input type="button" value="Cerca" onclick=response()>
+            <input type="button" value="Cerca" onclick=response()>
+        </form>
+
+    </div>
 </body>
 </html>

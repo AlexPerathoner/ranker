@@ -6,6 +6,7 @@ function inviaNick() {
     xhr.open("GET", theUrl, true);
     xhr.onload = (e) => {
         if (xhr.readyState === 4 && xhr.status === 200) {
+            localStorage.setItem('nick',nick);
             window.location.href = 'serie.html';
         } else {
             console.error(xhr.statusText);
@@ -20,6 +21,43 @@ function inviaNick() {
     };
     xhr.send(null);
     // todo
-    // una volta che il server ha risposto alla richiesta, cambia pagina (serie.html)
-    // ...document..location = series...
+    // implementare risposta json del server con i due anime scelti
+}
+
+function loadSeries(){
+    let theUrl = "localhost:8080/get-next-comparison?username="+localStorage.getItem("nick");
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", theUrl, true);
+    xhr.onload = (e) => {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            let my_Json_array = this.response;
+        } else {
+            console.error(xhr.statusText);
+        }
+    };
+
+    xhr.onerror = (e) => {
+        console.error(xhr.statusText);
+    };
+    xhr.send(null);
+}
+
+function response(nick){
+    let theUrl = "localhost:8080/add-link?betterId=102351&worseId=99147&username="+localStorage.getItem("nick");
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", theUrl, true);
+    xhr.onload = (e) => {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            loadSeries();
+        } else {
+            console.error(xhr.statusText);
+        }
+    };
+
+    xhr.onerror = (e) => {
+        console.error(xhr.statusText);
+    };
+    xhr.send(null);
 }
