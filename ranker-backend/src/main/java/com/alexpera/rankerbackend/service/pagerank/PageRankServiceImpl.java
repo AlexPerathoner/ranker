@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-
+// todo add logs for every method
 @Component
 public class PageRankServiceImpl implements PageRankService<AnilistMedia> {
     @Autowired
