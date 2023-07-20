@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+// todo remove interface, use only implementation, rename classes
+// todo add tests?
 public interface PageRankService<T extends Identifiable> {
     void add(String username, T item);
     void addAll(String username, ArrayList<T> items);
