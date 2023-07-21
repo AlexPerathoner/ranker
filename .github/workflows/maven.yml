@@ -40,6 +40,7 @@ jobs:
       run: mvn clean install
       working-directory: ./ranker-backend
     - name: Sonar
+      if: always()
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
