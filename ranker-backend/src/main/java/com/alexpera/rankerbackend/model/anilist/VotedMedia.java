@@ -23,10 +23,15 @@ public class VotedMedia extends RankedMedia {
 
     @Override
     public boolean equals(Object o) {
-        if(o instanceof VotedMedia item) {
-            return Objects.equals(this.getVote(), item.getVote());
-        }
         return super.equals(o);
+    }
+
+    @Override
+    public int compareTo(Media o) {
+        if (o instanceof VotedMedia media) {
+            return Double.compare(this.getVote(), media.getVote());
+        }
+        return super.compareTo(o);
     }
 
     @Override
