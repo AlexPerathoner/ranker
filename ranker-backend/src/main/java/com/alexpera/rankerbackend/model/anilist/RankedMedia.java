@@ -27,7 +27,7 @@ public class RankedMedia extends Media implements Comparable<Media> {
     @Override
     public boolean equals(Object object) {
         if(object instanceof RankedMedia item) {
-            return this.getId() == item.getId();
+            return Objects.equals(this.getId(), item.getId());
         }
         return super.equals(object);
     }

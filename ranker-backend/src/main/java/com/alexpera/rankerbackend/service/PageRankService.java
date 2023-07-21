@@ -1,7 +1,6 @@
-package com.alexpera.rankerbackend.service.pagerank;
+package com.alexpera.rankerbackend.service;
 
 import com.alexpera.rankerbackend.dao.model.Media;
-import com.alexpera.rankerbackend.dao.model.User;
 import com.alexpera.rankerbackend.dao.model.UsersMedia;
 import com.alexpera.rankerbackend.dao.model.UsersMediaId;
 import com.alexpera.rankerbackend.dao.repo.EdgeRepository;
@@ -12,6 +11,8 @@ import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
 import com.alexpera.rankerbackend.model.anilist.Edge;
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
 import com.alexpera.rankerbackend.model.anilist.VotedMedia;
+import lombok.Getter;
+import lombok.Setter;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -31,11 +32,23 @@ public class PageRankService {
     @Autowired
     MediaRepository mediaRepository;
 
+    @Autowired
+    AnilistService anilistService;
+
+    public PageRankService(UserRepository userRepository, UsersMediaRepository usersMediaRepository, EdgeRepository edgeRepository, MediaRepository mediaRepository, AnilistService anilistService) {
+        this.userRepository = userRepository;
+        this.usersMediaRepository = usersMediaRepository;
+        this.edgeRepository = edgeRepository;
+        this.mediaRepository = mediaRepository;
+        this.anilistService = anilistService;
+    }
+
+    @Getter
     private final HashMap<String, Graph<RankedMedia, DefaultEdge>> usersGraph = new HashMap<>();
 
     static final double DAMPING_FACTOR = 0.85;
 
-     private Graph<RankedMedia, DefaultEdge> getGraph(String username) {
+    private Graph<RankedMedia, DefaultEdge> getGraph(String username) {
         if (!usersGraph.containsKey(username)) {
             usersGraph.put(username, new DefaultDirectedGraph<>(DefaultEdge.class));
         }
@@ -58,7 +71,6 @@ public class PageRankService {
     }
 
     public void calculateIteration(String username) {
-        // todo redo
 //        HashMap<RankedMedia, Double> newValues = new HashMap<>();
 //        for (Media item : getGraph(username).vertexSet()) {
 //            double sum = 0;
@@ -127,26 +139,49 @@ public class PageRankService {
     }
 
     public Set<DefaultEdge> loadUser(String username) {
+        return loadUser(username, true);
+    }
+
+    public Set<DefaultEdge> loadUser(String username, boolean mergeAnilist) {
         if (usersGraph.containsKey(username)) {
             return new HashSet<>();
         }
 
-        // todo load from db
-        // load from anilist, too 
-
         Graph<RankedMedia, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+        loadVertex(username, mergeAnilist, graph);
+        loadEdges(username, graph);
+
+        usersGraph.put(username, graph); // todo low priority: add compatibility for concurrency
+        return graph.edgeSet();
+    }
+
+    private void loadEdges(String username, Graph<RankedMedia, DefaultEdge> graph) {
+        edgeRepository.findByUsername(username).forEach(edge -> {
+            graph.addEdge(edge.getBetter().toRankedMedia(), edge.getWorse().toRankedMedia());
+        });
+    }
+
+    private void loadVertex(String username, boolean mergeAnilist, Graph<RankedMedia, DefaultEdge> graph) {
         usersMediaRepository.findAllByUserId(username).forEach(
                 usersMedia -> {
                     RankedMedia rankedMedia = usersMedia.getMedia().toRankedMedia(usersMedia.getPagerankValue());
                     graph.addVertex(rankedMedia);
                 }
         );
-        edgeRepository.findByUsername(username).forEach(edge -> {
-            graph.addEdge(edge.getBetter().toRankedMedia(), edge.getWorse().toRankedMedia());
-        });
+        if (mergeAnilist) {
+            List<Media> anilistItems = anilistService.retrieveCompletedMedia(username);
+            // todo check if new items are in anilistItems, which weren't already in the db
+            // if so add them:
+            anilistItems.forEach(
+                    media -> {
+                        RankedMedia rankedMedia = media.toRankedMedia();
+                        graph.addVertex(rankedMedia);
+                    }
+            );
+            // todo remember to save the new items to the db, refactor this
+        }
+        // todo if there are new items, reset pagerankvalue for all items to 1/n
 
-        usersGraph.put(username, graph);
-        return graph.edgeSet();
     }
 
     public void savePageRankValues(String username) {
