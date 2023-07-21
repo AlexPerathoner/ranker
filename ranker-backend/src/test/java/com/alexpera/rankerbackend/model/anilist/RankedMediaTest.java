@@ -16,6 +16,7 @@ public class RankedMediaTest {
                 .meta("some other meta string here")
                 .pageRankValue(0.5)
                 .build();
+        
         assertEquals(rankedMedia, rankedMedia2);
     }
 }

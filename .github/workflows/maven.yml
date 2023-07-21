@@ -19,8 +19,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Move to correct sub dir
-      run: cd ranker-backend
+    - name: Generate application properties
+      run: 'echo "$APPLICATION_PROPERTIES" > ranker-backend/src/main/resources/application.properties'
+      shell: bash
+      env:
+        APPLICATION_PROPERTIES: ${{secrets.APPLICATION_PROPERTIES}}
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -34,10 +37,12 @@ jobs:
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
     - name: Build with Maven
-      run: mvn -B package --file ranker-backend/pom.xml
-    - name: Analyze
+      run: mvn clean install
+      working-directory: ./ranker-backend
+    - name: Sonar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=AlexPerathoner_ranker
+      run: mvn sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+      working-directory: ./ranker-backend
 
