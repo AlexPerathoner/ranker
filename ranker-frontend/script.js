@@ -83,8 +83,32 @@ function loadSeries(){
 }
 
 function loadJSONtest() {
-    const firstItem = jsontest[0];
-    console.log(firstItem.mediaId);
+
+    document.getElementById('json-container').style.display="flex"; //enable table
+
+    const tableBody = document.getElementById('json-container');
+    jsontest.forEach((item) => { //for every json value retrieved i append the following data
+        const animeimg = document.createElement('div');
+        animeimg.classList.add('image-wrapper'); //adds class
+        animeimg.innerHTML = `
+            <h2>${item.media.title.english}</h2>
+            <img src="${item.media.coverImage.extraLarge}">
+            <div class="buttons">
+            <button>Button 1</button>
+            </div>
+        `;
+        tableBody.appendChild(animeimg);
+
+        /*
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.media.title.english}</td>
+          <td><img src="${item.media.coverImage.extraLarge}"></td>
+          <td>${item.pageRankValue}</td>
+        `;
+        tableBody.appendChild(row);
+         */
+    });
 }
 
 function response(nick){
