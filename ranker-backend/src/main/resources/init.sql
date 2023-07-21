@@ -1,7 +1,7 @@
 // postgresql database
 
 drop table edges;
-drop table users_series;
+drop table users_medias;
 drop table users;
 drop table medias;
 
@@ -38,9 +38,10 @@ insert into medias (id, meta) values (99147, '{"title": {"romaji": "Shingeki no 
 insert into medias (id, meta) values (102351, '{"title": {"romaji": "Tokyo Ghoul:re 2","english": "Tokyo Ghoul:re 2","userPreferred": "Tokyo Ghoul:re 2"},"coverImage": {"extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx102351-yD3Ty9YZFMsf.jpg","large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx102351-yD3Ty9YZFMsf.jpg","medium": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx102351-yD3Ty9YZFMsf.jpg","color": "#f1e4c9"}}');
 insert into medias (id, meta) values (16498, '{"title": {"romaji": "Shingeki no Kyojin","english": "Attack on Titan","userPreferred": "Shingeki no Kyojin"},"coverImage": {"extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx16498-C6FPmWm59CyP.jpg","large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16498-C6FPmWm59CyP.jpg","medium": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx16498-C6FPmWm59CyP.jpg","color": "#e4a15d"}}');
 insert into users (id) values ('Piede');
-insert into users_medias (user_id, media_id) values ('Piede', 99147);
+insert into users_medias (user_id, media_id, pagerank_value) values ('Piede', 99147, 0.5);
 insert into users_medias (user_id, media_id) values ('Piede', 102351);
 insert into users_medias (user_id, media_id) values ('Piede', 16498);
+insert into edges (better_id, worse_id, username) values (99147, 102351, 'Piede');
 
 select * from users_medias, medias where users_medias.media_id = medias.id and users_medias.user_id = 'Piede';
 
