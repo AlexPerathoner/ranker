@@ -40,11 +40,14 @@ const jsontest = [
 function inviaNick() {
     let nick=document.getElementById("nick").value;
     let theUrl = "http://localhost:8080/load-series?username="+nick
+    console.log(theUrl);
 
     const xhr = new XMLHttpRequest();
     xhr.open("GET", theUrl, true);
     xhr.onload = (e) => {
-        if (xhr.readyState === 4 && xhr.status === 200) {
+        localStorage.setItem('nick',nick);
+        window.location.href = 'serie.html';
+       if (xhr.readyState === 4 && xhr.status === 200) {
             localStorage.setItem('nick',nick);
             window.location.href = 'serie.html';
         } else {
@@ -59,8 +62,6 @@ function inviaNick() {
         console.error(xhr.statusText);
     };
     xhr.send(null);
-    // todo
-    // implementare risposta json del server con i due anime scelti
 }
 
 function loadSeries(){
@@ -111,7 +112,7 @@ function loadJSONtest() {
     });
 }
 
-function response(nick){
+function response(){
     let theUrl = "localhost:8080/add-link?betterId=102351&worseId=99147&username="+localStorage.getItem("nick");
 
     const xhr = new XMLHttpRequest();

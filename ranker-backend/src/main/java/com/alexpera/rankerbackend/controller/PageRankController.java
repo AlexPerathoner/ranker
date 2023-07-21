@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Log4j2
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "http://localhost:8000")
 @Controller
 public class PageRankController {
     @Autowired
