@@ -66,7 +66,7 @@ public class PageRankController {
 
     @GetMapping("/get-items-ranked")
     public ResponseEntity<List<VotedMedia>> getItemsRanked(@RequestParam String username) {
-        return ResponseEntity.ok().body(pageRankService.getItemsVoted(username, DistributionFunction.LINEAR));
+        return ResponseEntity.ok().body(pageRankService.getItemsVotedAsc(username, DistributionFunction.LINEAR, 0, 10));
     }
 
     @GetMapping("/get-next-comparison")
@@ -82,7 +82,7 @@ public class PageRankController {
         if (better == null || worse == null) {
             return ResponseEntity.badRequest().body("Invalid id");
         }
-        pageRankService.addLink(username, better, worse);
+        pageRankService.addLink(username, worse, better);
         return ResponseEntity.ok().body("Link added");
     }
 

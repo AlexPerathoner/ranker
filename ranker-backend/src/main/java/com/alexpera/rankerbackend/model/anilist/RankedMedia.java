@@ -36,4 +36,15 @@ public class RankedMedia extends Media implements Comparable<Media> {
         return Objects.hash(super.hashCode(), pageRankValue);
     }
 
+    public VotedMedia toVotedMedia(double vote) {
+        if (this instanceof VotedMedia) {
+            return (VotedMedia) this;
+        }
+        return VotedMedia.votedMediaBuilder()
+                .id(this.getId())
+                .meta(this.getMeta())
+                .pageRankValue(this.getPageRankValue())
+                .vote(vote)
+                .build();
+    }
 }
