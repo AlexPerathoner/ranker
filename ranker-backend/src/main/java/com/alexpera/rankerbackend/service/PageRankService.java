@@ -8,6 +8,7 @@ import com.alexpera.rankerbackend.dao.repo.MediaRepository;
 import com.alexpera.rankerbackend.dao.repo.UserRepository;
 import com.alexpera.rankerbackend.dao.repo.UsersMediaRepository;
 import com.alexpera.rankerbackend.exceptions.EmptyGraphException;
+import com.alexpera.rankerbackend.exceptions.LoopException;
 import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
 import com.alexpera.rankerbackend.model.anilist.EdgeGraph;
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
@@ -55,7 +56,7 @@ public class PageRankService {
 
     public void add(String username, RankedMedia item) {
         if (!getGraph(username).containsVertex(item)) {
-            getGraph(username).addVertex(item.toRankedMedia());
+            getGraph(username).addVertex(item);
         }
     }
 
@@ -63,8 +64,10 @@ public class PageRankService {
         items.forEach(anilistMedia -> add(username, anilistMedia));
     }
 
-    public void addLink(String username, Media better, Media worse) {
-        // todo check for cycles, remove them
+    public void addLink(String username, Media worse, Media better) {
+        if (worse.equals(better)) {
+            throw new LoopException("Cannot add link to itself.");
+        }
         getGraph(username).addEdge(worse.toRankedMedia(), better.toRankedMedia());
     }
 
@@ -92,17 +95,21 @@ public class PageRankService {
         return getGraph(username).vertexSet().stream().sorted().toList();
     }
 
-    public List<VotedMedia> getItemsVoted(String username, DistributionFunction distribution) {
+    public List<VotedMedia> getItemsVotedAsc(String username, DistributionFunction distribution, double min, double max) {
         List<RankedMedia> items = getItemsSorted(username);
         List<VotedMedia> votedItems = new ArrayList<>();
         for (RankedMedia item : items) {
             double vote;
             if (distribution == DistributionFunction.LINEAR) {
-                vote = (items.size() - items.indexOf(item)) / (double) items.size();
-                votedItems.add(new VotedMedia(item, vote));
+                vote = (items.indexOf(item) / (double) (items.size()-1)) * (max - min) + min;
+            } else if (distribution == DistributionFunction.NORMAL) {
+                vote = Math.pow(2, -items.indexOf(item)); // todo implement this, add test
+            } else {
+                throw new IllegalArgumentException("Unknown distribution function");
             }
+            votedItems.add(item.toVotedMedia(vote));
         }
-        return votedItems.stream().sorted((a, b) -> Double.compare(b.getVote(), a.getVote())).toList();
+        return votedItems.stream().sorted((a, b) -> Double.compare(a.getVote(), b.getVote())).toList();
     }
 
     public Set<Media> getNextComparison(String username) throws EmptyGraphException {

@@ -96,4 +96,19 @@ class RankedMediaTest {
                 .build();
         assertEquals(rankedMedia2, rankedMedia);
     }
+    @Test
+    void toVotedMediaTestKeepValues() {
+        RankedMedia rankedMedia = RankedMedia.rankedMediaBuilder()
+                .id(1L)
+                .meta("some meta string here")
+                .pageRankValue(0.5)
+                .build();
+        VotedMedia votedMedia = rankedMedia.toVotedMedia(10);
+
+        assertEquals(votedMedia, rankedMedia.toRankedMedia());
+        assertEquals(votedMedia.getId(), rankedMedia.getId());
+        assertEquals(votedMedia.getMeta(), rankedMedia.getMeta());
+        assertEquals(votedMedia.getPageRankValue(), rankedMedia.getPageRankValue());
+        assertEquals(10, votedMedia.getVote());
+    }
 }

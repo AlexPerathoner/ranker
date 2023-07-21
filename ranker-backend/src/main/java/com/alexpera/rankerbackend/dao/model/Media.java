@@ -23,6 +23,9 @@ public class Media {
     private String meta;
 
     public RankedMedia toRankedMedia() {
+        if (this instanceof RankedMedia) {
+            return (RankedMedia) this;
+        }
         return RankedMedia.rankedMediaBuilder()
                 .id(this.getId())
                 .meta(this.getMeta())
