@@ -7,18 +7,47 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div style="text-align: center; padding-top: 100px;" id="anime-container">
-        <h1>SERIES CHOICES</h1>
-        <script>window.onload = function() {
-            loadSeries();
-        };</script>
-        <form>
-            <label>Nickname Anilist:</label><br>
+<div style="text-align: center; padding-top: 200px;" id="form-container">
+    <h1>VOTE FOR KANYE 2024</h1>
 
-            <input type="button" value="Cerca" onclick=response()>
-            <input type="button" value="Cerca" onclick=response()>
-        </form>
+    <input type="button" value="loadJSON" onclick="loadJSONtest()">
 
+    <div class="anime-container" id="json-container">
     </div>
+
+    <!--
+    <div class="anime-container">
+      <div class="image-wrapper">
+        <h2 id="anime-title1">Title 1</h2>
+        <img src="image1.jpg" id="anime-image1">
+        <div class="buttons">
+          <button>Button 1</button>
+        </div>
+      </div>
+      <div class="image-wrapper">
+        <h2 id="anime-title2">Title 2</h2>
+        <img src="image2.jpg" id="anime-image2">
+        <div class="buttons">
+          <button>Button 2</button>
+        </div>
+      </div>
+    </div>
+    -->
+    <!--
+
+  <table id="JSON-table">
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Image Test</th>
+      <th>Ranking</th>
+    </tr>
+    </thead>
+    <tbody>
+      </tbody>
+    </table>
+
+  -->
+</div>
 </body>
 </html>
