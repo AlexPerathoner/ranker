@@ -136,7 +136,10 @@ public class PageRankService {
 
         Graph<RankedMedia, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
         usersMediaRepository.findAllByUserId(username).forEach(
-                usersMedia -> graph.addVertex(new RankedMedia(usersMedia.getMedia(), usersMedia.getPagerankValue()))
+                usersMedia -> {
+                    RankedMedia rankedMedia = usersMedia.getMedia().toRankedMedia(usersMedia.getPagerankValue());
+                    graph.addVertex(rankedMedia);
+                }
         );
         edgeRepository.findByUsername(username).forEach(edge -> {
             graph.addEdge(edge.getBetter().toRankedMedia(), edge.getWorse().toRankedMedia());

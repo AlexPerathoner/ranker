@@ -8,13 +8,16 @@ import java.util.Objects;
 @Getter
 @Setter
 public class VotedMedia extends RankedMedia {
-     private Double vote;
+    private Double vote;
 
-    public VotedMedia(Media media) {
-        super(media);
-    }
     public VotedMedia(Media media, Double vote) {
-        super(media);
+        super(media.getId(), media.getMeta(), null);
+        this.vote = vote;
+    }
+
+    @Builder(builderMethodName = "votedMediaBuilder")
+    public VotedMedia(Long id, String meta, Double pageRankValue, Double vote) {
+        super(id, meta, pageRankValue);
         this.vote = vote;
     }
 
@@ -30,4 +33,5 @@ public class VotedMedia extends RankedMedia {
     public int hashCode() {
         return Objects.hash(super.hashCode(), vote);
     }
+
 }
