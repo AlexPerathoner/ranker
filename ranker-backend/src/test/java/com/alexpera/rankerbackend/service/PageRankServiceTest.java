@@ -18,7 +18,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PageRankServiceTest {
+class PageRankServiceTest {
     PageRankService pageRankService;
 
     @Mock
@@ -33,7 +33,7 @@ public class PageRankServiceTest {
     AnilistService anilistService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         pageRankService = new PageRankService(userRepository, usersMediaRepository, edgeRepository, mediaRepository, anilistService);
     }
 
@@ -43,10 +43,10 @@ public class PageRankServiceTest {
             .build();
 
     @Test
-    public void test() {
+    void test() {
         ArrayList<Media> mediaList = new ArrayList<>();
         mediaList.add(MEDIA);
-        when(anilistService.retrieveCompletedMedia(eq(USER))).thenReturn(mediaList);
+        when(anilistService.retrieveCompletedMedia(USER)).thenReturn(mediaList);
         pageRankService.loadUser(USER, true);
         assertTrue(pageRankService.getItems(USER).contains(MEDIA.toRankedMedia()));
     }

@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class VotedMediaTest {
+class VotedMediaTest {
     @Test
-    public void equalsTest() {
+    void equalsTest() {
         VotedMedia votedMedia1 = VotedMedia.votedMediaBuilder()
                 .id(1L)
                 .meta("some meta string here")
@@ -22,7 +22,7 @@ public class VotedMediaTest {
         assertEquals(votedMedia1, votedMedia2);
     }
     @Test
-    public void notEqualsTest() {
+    void notEqualsTest() {
         VotedMedia votedMedia1 = VotedMedia.votedMediaBuilder()
                 .id(1L)
                 .meta("some meta string here")

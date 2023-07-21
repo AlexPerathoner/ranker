@@ -2,7 +2,6 @@ package com.alexpera.rankerbackend.dao.model;
 
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

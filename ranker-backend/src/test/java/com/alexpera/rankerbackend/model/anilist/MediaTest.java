@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MediaTest {
+class MediaTest {
     @Test
-    public void equalsTest() {
+    void equalsTest() {
         Media media1 = Media.builder()
                 .id(1L)
                 .meta("some meta string here")
@@ -20,7 +20,7 @@ public class MediaTest {
         assertEquals(media1, media2);
     }
     @Test
-    public void notEqualsTest() {
+    void notEqualsTest() {
         Media media1 = Media.builder()
                 .id(1L)
                 .meta("some meta string here")
@@ -34,7 +34,7 @@ public class MediaTest {
     }
 
     @Test
-    public void toRankedMediaTest() {
+    void toRankedMediaTest() {
         Double randomPageRankValue = 0.2;
         Media media = Media.builder()
                 .id(1L)

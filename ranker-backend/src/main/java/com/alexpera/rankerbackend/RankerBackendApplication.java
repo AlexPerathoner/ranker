@@ -8,8 +8,6 @@ public class RankerBackendApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(RankerBackendApplication.class, args);
-
-        // retrieve data from database
     }
 
 }

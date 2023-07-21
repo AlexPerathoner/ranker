@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RankedMediaTest {
+class RankedMediaTest {
     @Test
-    public void equalsTest() {
+    void equalsTest() {
 
         RankedMedia rankedMedia = RankedMedia.rankedMediaBuilder()
                 .id(1L)
@@ -23,7 +23,7 @@ public class RankedMediaTest {
     }
 
     @Test
-    public void compareTestNull() {
+    void compareTestNull() {
         RankedMedia rankedMedia = RankedMedia.rankedMediaBuilder()
                 .id(1L)
                 .meta("some meta string here")
@@ -39,7 +39,7 @@ public class RankedMediaTest {
         });
     }
     @Test
-    public void compareTestSmaller() {
+    void compareTestSmaller() {
         RankedMedia rankedMedia = RankedMedia.rankedMediaBuilder()
                 .id(1L)
                 .meta("some meta string here")
@@ -54,7 +54,7 @@ public class RankedMediaTest {
         assertEquals(-1, rankedMedia.compareTo(rankedMedia2));
     }
     @Test
-    public void compareTestBigger() {
+    void compareTestBigger() {
         RankedMedia rankedMedia = RankedMedia.rankedMediaBuilder()
                 .id(1L)
                 .meta("some meta string here")
@@ -69,7 +69,7 @@ public class RankedMediaTest {
         assertEquals(1, rankedMedia2.compareTo(rankedMedia));
     }
     @Test
-    public void compareTestEqual() {
+    void compareTestEqual() {
         RankedMedia rankedMedia = RankedMedia.rankedMediaBuilder()
                 .id(1L)
                 .meta("some meta string here")
@@ -84,7 +84,7 @@ public class RankedMediaTest {
         assertEquals(0, rankedMedia2.compareTo(rankedMedia));
     }
     @Test
-    public void compareTestMedia() {
+    void compareTestMedia() {
         Media rankedMedia = Media.builder()
                 .id(1L)
                 .meta("some meta string here")

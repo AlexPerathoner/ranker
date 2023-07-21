@@ -7,12 +7,12 @@ import com.alexpera.rankerbackend.dao.repo.EdgeRepository;
 import com.alexpera.rankerbackend.dao.repo.MediaRepository;
 import com.alexpera.rankerbackend.dao.repo.UserRepository;
 import com.alexpera.rankerbackend.dao.repo.UsersMediaRepository;
+import com.alexpera.rankerbackend.exceptions.EmptyGraphException;
 import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
-import com.alexpera.rankerbackend.model.anilist.Edge;
+import com.alexpera.rankerbackend.model.anilist.EdgeGraph;
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
 import com.alexpera.rankerbackend.model.anilist.VotedMedia;
 import lombok.Getter;
-import lombok.Setter;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -49,9 +49,7 @@ public class PageRankService {
     static final double DAMPING_FACTOR = 0.85;
 
     private Graph<RankedMedia, DefaultEdge> getGraph(String username) {
-        if (!usersGraph.containsKey(username)) {
-            usersGraph.put(username, new DefaultDirectedGraph<>(DefaultEdge.class));
-        }
+        usersGraph.computeIfAbsent(username, k -> new DefaultDirectedGraph<>(DefaultEdge.class));
         return usersGraph.get(username);
     }
 
@@ -61,7 +59,7 @@ public class PageRankService {
         }
     }
 
-    public void addAll(String username, ArrayList<RankedMedia> items) {
+    public void addAll(String username, List<RankedMedia> items) {
         items.forEach(anilistMedia -> add(username, anilistMedia));
     }
 
@@ -99,7 +97,7 @@ public class PageRankService {
         List<VotedMedia> votedItems = new ArrayList<>();
         for (RankedMedia item : items) {
             double vote;
-            if (distribution == DistributionFunction.constant) {
+            if (distribution == DistributionFunction.LINEAR) {
                 vote = (items.size() - items.indexOf(item)) / (double) items.size();
                 votedItems.add(new VotedMedia(item, vote));
             }
@@ -107,7 +105,7 @@ public class PageRankService {
         return votedItems.stream().sorted((a, b) -> Double.compare(b.getVote(), a.getVote())).toList();
     }
 
-    public Set<Media> getNextComparison(String username) throws RuntimeException {
+    public Set<Media> getNextComparison(String username) throws EmptyGraphException {
         // find item with lowest number of incoming or outgoing edges
         RankedMedia minItem = null;
         int minEdges = Integer.MAX_VALUE;
@@ -124,16 +122,16 @@ public class PageRankService {
         RankedMedia midItem = items.get(items.size() / 2);
 
         if (minItem == null) {
-            throw new RuntimeException("No items in graph");
+            throw new EmptyGraphException("No items in graph for user " + username + " to compare.");
         }
         return Set.of(minItem, midItem);
     }
 
-    public Set<Edge<RankedMedia>> getEdges(String username) {
+    public Set<EdgeGraph<RankedMedia>> getEdges(String username) {
         Set<DefaultEdge> edges = getGraph(username).edgeSet();
-        HashSet<Edge<RankedMedia>> result = new HashSet<>();
+        HashSet<EdgeGraph<RankedMedia>> result = new HashSet<>();
         for (DefaultEdge edge : edges) {
-            result.add(new Edge<>(getGraph(username).getEdgeSource(edge), getGraph(username).getEdgeTarget(edge)));
+            result.add(new EdgeGraph<>(getGraph(username).getEdgeSource(edge), getGraph(username).getEdgeTarget(edge)));
         }
         return result;
     }
@@ -156,9 +154,8 @@ public class PageRankService {
     }
 
     private void loadEdges(String username, Graph<RankedMedia, DefaultEdge> graph) {
-        edgeRepository.findByUsername(username).forEach(edge -> {
-            graph.addEdge(edge.getBetter().toRankedMedia(), edge.getWorse().toRankedMedia());
-        });
+        edgeRepository.findByUsername(username).forEach(edge -> graph
+                .addEdge(edge.getBetter().toRankedMedia(),edge.getWorse().toRankedMedia()));
     }
 
     private void loadVertex(String username, boolean mergeAnilist, Graph<RankedMedia, DefaultEdge> graph) {

@@ -3,7 +3,7 @@ package com.alexpera.rankerbackend.controller;
 import com.alexpera.rankerbackend.dao.model.Media;
 import com.alexpera.rankerbackend.dao.repo.UserRepository;
 import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
-import com.alexpera.rankerbackend.model.anilist.Edge;
+import com.alexpera.rankerbackend.model.anilist.EdgeGraph;
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
 import com.alexpera.rankerbackend.model.anilist.VotedMedia;
 import com.alexpera.rankerbackend.service.PageRankService;
@@ -59,14 +59,14 @@ public class PageRankController {
     }
 
     @GetMapping("/load-series")
-    public ResponseEntity loadSeries(@RequestParam String username) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> loadSeries(@RequestParam String username) {
+        return ResponseEntity.ok().body("Loaded series");
     }
 
 
     @GetMapping("/get-items-ranked")
     public ResponseEntity<List<VotedMedia>> getItemsRanked(@RequestParam String username) {
-        return ResponseEntity.ok().body(pageRankService.getItemsVoted(username, DistributionFunction.constant));
+        return ResponseEntity.ok().body(pageRankService.getItemsVoted(username, DistributionFunction.LINEAR));
     }
 
     @GetMapping("/get-next-comparison")
@@ -100,15 +100,15 @@ public class PageRankController {
     }
 
     @GetMapping("/edges-id")
-    public ResponseEntity<List<Edge<Long>>> edgesId(@RequestParam String username) {
-        List<Edge<RankedMedia>> edges = pageRankService.getEdges(username).stream().toList();
+    public ResponseEntity<List<EdgeGraph<Long>>> edgesId(@RequestParam String username) {
+        List<EdgeGraph<RankedMedia>> edges = pageRankService.getEdges(username).stream().toList();
 
-        List<Edge<Long>> edgesId = edges.stream().map(edge -> new Edge<>(edge.getSource().getId(), edge.getTarget().getId())).toList();
+        List<EdgeGraph<Long>> edgesId = edges.stream().map(edge -> new EdgeGraph<>(edge.getSource().getId(), edge.getTarget().getId())).toList();
         return ResponseEntity.ok().body(edgesId);
     }
     @GetMapping("/edges")
-    public ResponseEntity<List<Edge<RankedMedia>>> edges(@RequestParam String username) {
-        List<Edge<RankedMedia>> edges = pageRankService.getEdges(username).stream().toList();
+    public ResponseEntity<List<EdgeGraph<RankedMedia>>> edges(@RequestParam String username) {
+        List<EdgeGraph<RankedMedia>> edges = pageRankService.getEdges(username).stream().toList();
 
         return ResponseEntity.ok().body(edges);
     }

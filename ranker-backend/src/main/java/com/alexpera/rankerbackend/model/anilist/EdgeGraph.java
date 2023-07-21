@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Edge<T> {
-    public T source;
-    public T target;
+public class EdgeGraph<T> {
+    private T source;
+    private T target;
 }

@@ -2,7 +2,6 @@ package com.alexpera.rankerbackend.model.anilist;
 
 import com.alexpera.rankerbackend.dao.model.Media;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 
