@@ -1,11 +1,15 @@
 package com.alexpera.rankerbackend.controller;
 
-import com.alexpera.rankerbackend.model.anilist.AnilistMedia;
+import com.alexpera.rankerbackend.dao.model.Media;
+import com.alexpera.rankerbackend.dao.repo.UserRepository;
 import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
 import com.alexpera.rankerbackend.model.anilist.Edge;
+import com.alexpera.rankerbackend.model.anilist.RankedMedia;
+import com.alexpera.rankerbackend.model.anilist.VotedMedia;
 import com.alexpera.rankerbackend.service.pagerank.PageRankService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
+import org.jgrapht.graph.DefaultEdge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,7 +26,20 @@ import java.util.*;
 @Controller
 public class PageRankController {
     @Autowired
-    PageRankService<AnilistMedia> pageRankService;
+    UserRepository userRepository;
+
+    @Autowired
+    PageRankService pageRankService;
+
+    @GetMapping("/load-user")
+    public ResponseEntity<Set<DefaultEdge>> loadUser(@RequestParam String username) {
+        return ResponseEntity.ok().body(pageRankService.loadUser(username));
+    }
+
+    @GetMapping("/test-repo")
+    public ResponseEntity<Set<Media>> testRepo() {
+        return ResponseEntity.ok().body(userRepository.findById("Piede").getMedias());
+    }
 
     @GetMapping("/load-file")
     public ResponseEntity<String> loadFile(@RequestParam String username) throws IOException {
@@ -30,14 +47,14 @@ public class PageRankController {
             Objects.requireNonNull(this.getClass().getClassLoader().getResource("completedSeriesSmall.json")).getFile()
         );
         ObjectMapper mapper = new ObjectMapper();
-        AnilistMedia[] anilistMedias = mapper.readValue(file, AnilistMedia[].class);
-        ArrayList<AnilistMedia> anilistMediaArrayList = new ArrayList<>(Arrays.asList(anilistMedias));
+        RankedMedia[] anilistMedias = mapper.readValue(file, RankedMedia[].class);
+        ArrayList<RankedMedia> anilistMediaArrayList = new ArrayList<>(Arrays.asList(anilistMedias));
         pageRankService.addAll(username, anilistMediaArrayList);
         return ResponseEntity.ok().body("File loaded");
     }
 
     @GetMapping("/get-items-sorted")
-    public ResponseEntity<List<AnilistMedia>> getItemsSorted(@RequestParam String username) {
+    public ResponseEntity<List<RankedMedia>> getItemsSorted(@RequestParam String username) {
         return ResponseEntity.ok().body(pageRankService.getItemsSorted(username));
     }
 
@@ -48,20 +65,20 @@ public class PageRankController {
 
 
     @GetMapping("/get-items-ranked")
-    public ResponseEntity<List<AnilistMedia>> getItemsRanked(@RequestParam String username) {
-        return ResponseEntity.ok().body(pageRankService.getItemsRanked(username, DistributionFunction.constant));
+    public ResponseEntity<List<VotedMedia>> getItemsRanked(@RequestParam String username) {
+        return ResponseEntity.ok().body(pageRankService.getItemsVoted(username, DistributionFunction.constant));
     }
 
     @GetMapping("/get-next-comparison")
-    public ResponseEntity<Set<AnilistMedia>> getNextComparison(@RequestParam String username) {
+    public ResponseEntity<Set<Media>> getNextComparison(@RequestParam String username) {
         return ResponseEntity.ok().body(pageRankService.getNextComparison(username));
     }
 
     @GetMapping("/add-link")
     public ResponseEntity<String> addLink(@RequestParam String username, @RequestParam long betterId, @RequestParam long worseId) {
-        Set<AnilistMedia> items = pageRankService.getItems(username);
-        AnilistMedia better = items.stream().filter(item -> item.getId() == betterId).findFirst().orElse(null);
-        AnilistMedia worse = items.stream().filter(item -> item.getId() == worseId).findFirst().orElse(null);
+        Set<RankedMedia> items = pageRankService.getItems(username);
+        RankedMedia better = items.stream().filter(item -> item.getId() == betterId).findFirst().orElse(null);
+        RankedMedia worse = items.stream().filter(item -> item.getId() == worseId).findFirst().orElse(null);
         if (better == null || worse == null) {
             return ResponseEntity.badRequest().body("Invalid id");
         }
@@ -70,7 +87,7 @@ public class PageRankController {
     }
 
     @GetMapping("/calculate-iteration")
-    public ResponseEntity<List<AnilistMedia>> calculateIteration(@RequestParam String username) {
+    public ResponseEntity<List<RankedMedia>> calculateIteration(@RequestParam String username) {
         pageRankService.calculateIteration(username);
         return ResponseEntity.ok().body(pageRankService.getItemsSorted(username));
     }
@@ -84,14 +101,14 @@ public class PageRankController {
 
     @GetMapping("/edges-id")
     public ResponseEntity<List<Edge<Long>>> edgesId(@RequestParam String username) {
-        List<Edge<AnilistMedia>> edges = pageRankService.getEdges(username).stream().toList();
+        List<Edge<RankedMedia>> edges = pageRankService.getEdges(username).stream().toList();
 
         List<Edge<Long>> edgesId = edges.stream().map(edge -> new Edge<>(edge.getSource().getId(), edge.getTarget().getId())).toList();
         return ResponseEntity.ok().body(edgesId);
     }
     @GetMapping("/edges")
-    public ResponseEntity<List<Edge<AnilistMedia>>> edges(@RequestParam String username) {
-        List<Edge<AnilistMedia>> edges = pageRankService.getEdges(username).stream().toList();
+    public ResponseEntity<List<Edge<RankedMedia>>> edges(@RequestParam String username) {
+        List<Edge<RankedMedia>> edges = pageRankService.getEdges(username).stream().toList();
 
         return ResponseEntity.ok().body(edges);
     }
