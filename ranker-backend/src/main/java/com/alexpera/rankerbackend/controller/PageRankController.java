@@ -6,7 +6,7 @@ import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
 import com.alexpera.rankerbackend.model.anilist.Edge;
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
 import com.alexpera.rankerbackend.model.anilist.VotedMedia;
-import com.alexpera.rankerbackend.service.pagerank.PageRankService;
+import com.alexpera.rankerbackend.service.PageRankService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.jgrapht.graph.DefaultEdge;
@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Log4j2
-@CrossOrigin(maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:8080")
 @Controller
 public class PageRankController {
     @Autowired

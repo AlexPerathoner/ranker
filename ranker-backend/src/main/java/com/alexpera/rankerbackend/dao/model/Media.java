@@ -6,14 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "medias")
+@SuperBuilder
 public class Media {
     @Id
     @Column(name = "id")
@@ -23,9 +24,17 @@ public class Media {
     private String meta;
 
     public RankedMedia toRankedMedia() {
-        return RankedMedia.builder()
+        return RankedMedia.rankedMediaBuilder()
                 .id(this.getId())
                 .meta(this.getMeta())
+                .build();
+    }
+
+    public RankedMedia toRankedMedia(Double pageRankValue) {
+        return RankedMedia.rankedMediaBuilder()
+                .id(this.getId())
+                .meta(this.getMeta())
+                .pageRankValue(pageRankValue)
                 .build();
     }
 
@@ -40,5 +49,11 @@ public class Media {
     @Override
     public int hashCode() {
         return Objects.hash(id, meta);
+    }
+
+    @Builder
+    public Media(Long id, String meta) {
+        this.id = id;
+        this.meta = meta;
     }
 }
