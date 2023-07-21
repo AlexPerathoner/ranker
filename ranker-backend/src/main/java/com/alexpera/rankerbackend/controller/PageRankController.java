@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Log4j2
-@CrossOrigin(maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:8080")
 @Controller
 public class PageRankController {
     @Autowired
