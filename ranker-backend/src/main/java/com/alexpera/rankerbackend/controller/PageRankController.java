@@ -13,6 +13,7 @@ import org.jgrapht.graph.DefaultEdge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Log4j2
+@CrossOrigin(maxAge = 3600)
 @Controller
 public class PageRankController {
     @Autowired
