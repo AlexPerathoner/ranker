@@ -1,3 +1,7 @@
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=AlexPerathoner_ranker&metric=coverage)](https://sonarcloud.io/summary/new_code?id=AlexPerathoner_ranker)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=AlexPerathoner_ranker&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=AlexPerathoner_ranker)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=AlexPerathoner_ranker&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=AlexPerathoner_ranker)
+
 # todo
 
 ## Backend
