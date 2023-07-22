@@ -60,7 +60,7 @@ input:focus {
 
 .question{
     margin: 0;
-    font-size: 60px;
+    font-size: 70px;
     color: cornflowerblue;
     font-family: Arial, sans-serif;
     font-weight: bold;
@@ -153,6 +153,21 @@ input:focus {
 
 .header-right{
     float: right;
+}
+
+footer{
+    position: fixed;
+    bottom: 0;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-top: 36px;
+    width: 100%;
+    font-size: 14px;
+}
+
+footer p{
+    font-size: 14px;
 }
 
 /*CSS X TEST JSON*/

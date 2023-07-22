@@ -38,12 +38,13 @@ const jsontest = [
 ]
 
 let arrayButton= [];
+let http= "http://localhost:8080";
 
 
 //controlla se il nick esiste su anilist, se esiste carica la sua anilist
 function inviaNick() {
     let nick=document.getElementById("nick").value;
-    let theUrl = "http://localhost:8080/load-series?username="+nick
+    let theUrl = http+"/load-series?username="+nick;
     console.log(theUrl);
 
     const xhr = new XMLHttpRequest();
@@ -70,7 +71,7 @@ function inviaNick() {
 
 //metodo finale da usare quando possiamo prendere gli oggetti json da controller
 function loadSeries(){
-    let theUrl = "localhost:8080/get-next-comparison?username="+localStorage.getItem("nick");
+    let theUrl = http+"/get-next-comparison?username="+localStorage.getItem("nick");
 
     const xhr = new XMLHttpRequest();
     xhr.open("GET", theUrl, false);
@@ -182,15 +183,22 @@ function loadJSONtest() {
 
         tableBody.appendChild(animeimg);
 
-        if (index === 1) {
+        if (index === 0) {
             const preferContainer = document.createElement('div');
             preferContainer.classList.add('prefer-container');
 
             const testoPrefer = document.createElement('h1');
             testoPrefer.classList.add('question');
-            testoPrefer.style.paddingTop="250px";
+            testoPrefer.style.paddingTop="50px";
             testoPrefer.innerHTML = 'WHICH DO YOU <span class="prefer-linebreak">PREFER?</span>';
             preferContainer.appendChild(testoPrefer);
+
+            tableBody.insertBefore(preferContainer, animeimg);
+        }
+
+        if (index === 1) {
+            const preferContainer = document.createElement('div');
+            preferContainer.classList.add('prefer-container');
 
             const buttonsDiv = document.createElement('div');
             buttonsDiv.classList.add('buttons');
@@ -202,8 +210,8 @@ function loadJSONtest() {
                 response("0");
             };
             arrayButton[2]=0;
-            preferButton.style.marginTop="220px";
-            preferButton.textContent = 'Equal';
+            preferButton.style.marginTop="600px";
+            preferButton.textContent = 'Equals';
             buttonsDiv.appendChild(preferButton);
             preferContainer.appendChild(buttonsDiv);
 
@@ -217,12 +225,13 @@ function loadJSONtest() {
 function response(id){
     let theUrl;
     if(id==="0"){
-        theUrl = "localhost:8080/add-link?betterId=0&worseId=0&username="+localStorage.getItem("nick");
+        theUrl = http+"/add-link?betterId=0&worseId=0&username="+localStorage.getItem("nick");
     } else if(id===arrayButton[0]){
-        theUrl = "localhost:8080/add-link?betterId="+id+"&worseId="+arrayButton[1]+"&username="+localStorage.getItem("nick");
+        theUrl = http+"/add-link?betterId="+id+"&worseId="+arrayButton[1]+"&username="+localStorage.getItem("nick");
     } else {
-        theUrl = "localhost:8080/add-link?betterId="+id+"&worseId="+arrayButton[0]+"&username="+localStorage.getItem("nick");
+        theUrl = http+"/add-link?betterId="+id+"&worseId="+arrayButton[0]+"&username="+localStorage.getItem("nick");
     }
+
 
     const xhr = new XMLHttpRequest();
     xhr.open("GET", theUrl, true);
@@ -246,5 +255,4 @@ function response(id){
 }
 
 //todo
-//aggiungere pulsante per quando gli anime son uguali
 //rendere le immagini cliccabili
