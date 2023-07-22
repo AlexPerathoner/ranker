@@ -37,6 +37,9 @@ const jsontest = [
     }
 ]
 
+let arrayButton= [];
+
+
 //controlla se il nick esiste su anilist, se esiste carica la sua anilist
 function inviaNick() {
     let nick=document.getElementById("nick").value;
@@ -92,6 +95,12 @@ function loadSeries(){
                 buttonsDiv.classList.add('buttons');
 
                 const button = document.createElement('button');
+                button.type="button";
+                button.value=item.mediaId;
+                button.onclick = function() {
+                    response(item.mediaId);
+                };
+                arrayButton[index]=item.mediaId;
                 button.textContent = 'Choose';
                 buttonsDiv.appendChild(button);
 
@@ -113,6 +122,12 @@ function loadSeries(){
                     buttonsDiv.classList.add('buttons');
 
                     const preferButton = document.createElement('button');
+                    button.type="button";
+                    preferButton.value="0";
+                    preferButton.onclick = function() {
+                        response("0");
+                    };
+                    arrayButton[2]=0;
                     preferButton.style.marginTop="220px";
                     preferButton.textContent = 'Equal';
                     buttonsDiv.appendChild(preferButton);
@@ -154,6 +169,12 @@ function loadJSONtest() {
         buttonsDiv.classList.add('buttons');
 
         const button = document.createElement('button');
+        button.type="button";
+        button.value=item.mediaId;
+        button.onclick = function() {
+            response(item.mediaId);
+        };
+        arrayButton[index]=item.mediaId;
         button.textContent = 'Choose';
         buttonsDiv.appendChild(button);
 
@@ -175,6 +196,12 @@ function loadJSONtest() {
             buttonsDiv.classList.add('buttons');
 
             const preferButton = document.createElement('button');
+            button.type="button";
+            preferButton.value="0";
+            preferButton.onclick = function() {
+                response("0");
+            };
+            arrayButton[2]=0;
             preferButton.style.marginTop="220px";
             preferButton.textContent = 'Equal';
             buttonsDiv.appendChild(preferButton);
@@ -187,14 +214,24 @@ function loadJSONtest() {
 }
 
 //restituisce la scelta dell'utente e carica la prossima coppia
-function response(){
-    let theUrl = "localhost:8080/add-link?betterId=102351&worseId=99147&username="+localStorage.getItem("nick");
+function response(id){
+    let theUrl;
+    if(id==="0"){
+        theUrl = "localhost:8080/add-link?betterId=0&worseId=0&username="+localStorage.getItem("nick");
+    } else if(id===arrayButton[0]){
+        theUrl = "localhost:8080/add-link?betterId="+id+"&worseId="+arrayButton[1]+"&username="+localStorage.getItem("nick");
+    } else {
+        theUrl = "localhost:8080/add-link?betterId="+id+"&worseId="+arrayButton[0]+"&username="+localStorage.getItem("nick");
+    }
 
     const xhr = new XMLHttpRequest();
     xhr.open("GET", theUrl, true);
     xhr.onload = (e) => {
         if (xhr.readyState === 4 && xhr.status === 200) {
-            loadSeries();
+            const myDiv = document.getElementById('json-container');
+            myDiv.innerHTML = '';
+            arrayButton = [];
+            loadJSONtest();
         } else {
             console.error(xhr.statusText);
         }
@@ -204,6 +241,8 @@ function response(){
         console.error(xhr.statusText);
     };
     xhr.send(null);
+
+    return 0;
 }
 
 //todo
