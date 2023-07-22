@@ -37,6 +37,7 @@ const jsontest = [
     }
 ]
 
+//controlla se il nick esiste su anilist, se esiste carica la sua anilist
 function inviaNick() {
     let nick=document.getElementById("nick").value;
     let theUrl = "http://localhost:8080/load-series?username="+nick
@@ -64,17 +65,65 @@ function inviaNick() {
     xhr.send(null);
 }
 
+//metodo finale da usare quando possiamo prendere gli oggetti json da controller
 function loadSeries(){
     let theUrl = "localhost:8080/get-next-comparison?username="+localStorage.getItem("nick");
 
     const xhr = new XMLHttpRequest();
     xhr.open("GET", theUrl, false);
     xhr.onload = (e) => {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            let my_Json_array = this.response;
-        } else {
+       if (xhr.readyState === 4 && xhr.status === 200) {
+            let my_Json_obj = this.response;
+            document.getElementById('json-container').style.display="flex"; //enable table
+            const tableBody = document.getElementById('json-container');
+            my_Json_obj.forEach((item, index) => {
+                const animeimg = document.createElement('div');
+                animeimg.classList.add('image-wrapper'); // Aggiunge la classe 'image-wrapper' al div
+
+                const title = document.createElement('h2');
+                title.textContent = item.media.title.english;
+                animeimg.appendChild(title);
+
+                const image = document.createElement('img');
+                image.src = item.media.coverImage.extraLarge;
+                animeimg.appendChild(image);
+
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.classList.add('buttons');
+
+                const button = document.createElement('button');
+                button.textContent = 'Choose';
+                buttonsDiv.appendChild(button);
+
+                animeimg.appendChild(buttonsDiv);
+
+                tableBody.appendChild(animeimg);
+
+                if (index === 1) {
+                    const preferContainer = document.createElement('div');
+                    preferContainer.classList.add('prefer-container');
+
+                    const testoPrefer = document.createElement('h1');
+                    testoPrefer.classList.add('question');
+                    testoPrefer.style.paddingTop="250px";
+                    testoPrefer.innerHTML = 'WHICH DO YOU <span class="prefer-linebreak">PREFER?</span>';
+                    preferContainer.appendChild(testoPrefer);
+
+                    const buttonsDiv = document.createElement('div');
+                    buttonsDiv.classList.add('buttons');
+
+                    const preferButton = document.createElement('button');
+                    preferButton.style.marginTop="220px";
+                    preferButton.textContent = 'Equal';
+                    buttonsDiv.appendChild(preferButton);
+                    preferContainer.appendChild(buttonsDiv);
+
+                    tableBody.insertBefore(preferContainer, animeimg);
+                }
+           });
+       } else {
             console.error(xhr.statusText);
-        }
+       }
     };
 
     xhr.onerror = (e) => {
@@ -83,35 +132,61 @@ function loadSeries(){
     xhr.send(null);
 }
 
+//metodo prova per stampare oggetti json
 function loadJSONtest() {
 
-    document.getElementById('json-container').style.display="flex"; //enable table
+    document.getElementById('json-container').style.display = "flex"; //enable table
 
     const tableBody = document.getElementById('json-container');
-    jsontest.forEach((item) => { //for every json value retrieved i append the following data
+    jsontest.forEach((item, index) => {
         const animeimg = document.createElement('div');
-        animeimg.classList.add('image-wrapper'); //adds class
-        animeimg.innerHTML = `
-            <h2>${item.media.title.english}</h2>
-            <img src="${item.media.coverImage.extraLarge}">
-            <div class="buttons">
-            <button>Button 1</button>
-            </div>
-        `;
+        animeimg.classList.add('image-wrapper'); // Aggiunge la classe 'image-wrapper' al div
+
+        const title = document.createElement('h2');
+        title.textContent = item.media.title.english;
+        animeimg.appendChild(title);
+
+        const image = document.createElement('img');
+        image.src = item.media.coverImage.extraLarge;
+        animeimg.appendChild(image);
+
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.classList.add('buttons');
+
+        const button = document.createElement('button');
+        button.textContent = 'Choose';
+        buttonsDiv.appendChild(button);
+
+        animeimg.appendChild(buttonsDiv);
+
         tableBody.appendChild(animeimg);
 
-        /*
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${item.media.title.english}</td>
-          <td><img src="${item.media.coverImage.extraLarge}"></td>
-          <td>${item.pageRankValue}</td>
-        `;
-        tableBody.appendChild(row);
-         */
+        if (index === 1) {
+            const preferContainer = document.createElement('div');
+            preferContainer.classList.add('prefer-container');
+
+            const testoPrefer = document.createElement('h1');
+            testoPrefer.classList.add('question');
+            testoPrefer.style.paddingTop="250px";
+            testoPrefer.innerHTML = 'WHICH DO YOU <span class="prefer-linebreak">PREFER?</span>';
+            preferContainer.appendChild(testoPrefer);
+
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.classList.add('buttons');
+
+            const preferButton = document.createElement('button');
+            preferButton.style.marginTop="220px";
+            preferButton.textContent = 'Equal';
+            buttonsDiv.appendChild(preferButton);
+            preferContainer.appendChild(buttonsDiv);
+
+            tableBody.insertBefore(preferContainer, animeimg);
+        }
     });
+
 }
 
+//restituisce la scelta dell'utente e carica la prossima coppia
 function response(){
     let theUrl = "localhost:8080/add-link?betterId=102351&worseId=99147&username="+localStorage.getItem("nick");
 
@@ -130,3 +205,7 @@ function response(){
     };
     xhr.send(null);
 }
+
+//todo
+//aggiungere pulsante per quando gli anime son uguali
+//rendere le immagini cliccabili
