@@ -34,9 +34,7 @@ class RankedMediaTest {
                 .pageRankValue(0.5)
                 .build();
 
-        assertThrows(NullPointerException.class, () -> {
-            rankedMedia.compareTo(rankedMedia2);
-        });
+        assertEquals(0, rankedMedia.compareTo(rankedMedia2)); // needed for graph
     }
     @Test
     void compareTestSmaller() {
@@ -51,7 +49,7 @@ class RankedMediaTest {
                 .pageRankValue(0.5)
                 .build();
 
-        assertEquals(-1, rankedMedia.compareTo(rankedMedia2));
+        assertEquals(0, rankedMedia.compareTo(rankedMedia2)); // needed for graph
     }
     @Test
     void compareTestBigger() {
@@ -66,7 +64,7 @@ class RankedMediaTest {
                 .pageRankValue(0.5)
                 .build();
 
-        assertEquals(1, rankedMedia2.compareTo(rankedMedia));
+        assertEquals(0, rankedMedia2.compareTo(rankedMedia));
     }
     @Test
     void compareTestEqual() {

@@ -20,7 +20,9 @@ public class RankedMedia extends Media implements Comparable<Media> {
 
     @Override
     public int compareTo(Media o) {
-        return Double.compare(this.getPageRankValue(), ((RankedMedia) o).getPageRankValue());
+        // ignoring page rank value as it would change the key of the hashmap used in the graph,
+        // causing it to not find the item in the graph anymore
+        return getId().compareTo(o.getId());
     }
 
     @Override
@@ -33,7 +35,8 @@ public class RankedMedia extends Media implements Comparable<Media> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), pageRankValue);
+        // ignoring pagerank value for same reasons as above
+        return super.hashCode();
     }
 
     public VotedMedia toVotedMedia(double vote) {

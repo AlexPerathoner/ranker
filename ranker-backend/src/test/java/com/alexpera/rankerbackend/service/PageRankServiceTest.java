@@ -97,11 +97,28 @@ class PageRankServiceTest {
     }
 
     @Test
-    @Disabled("Check jgraph implementation throwing exception")
-    void oneLinkTestTwoIterations() {
+    void oneLinkTestMultipleIterations() {
         graph.addEdge(rankedMedia1, rankedMedia2);
         PageRankService.calculateIteration(graph);
         PageRankService.calculateIteration(graph);
+        PageRankService.calculateIteration(graph);
         assertTrue(Double.compare(rankedMedia1.getPageRankValue(), rankedMedia2.getPageRankValue()) < 0);
+    }
+
+    @Test
+    void noDuplicateEdges() {
+        graph.addEdge(rankedMedia1, rankedMedia2);
+        graph.addEdge(rankedMedia2, rankedMedia3);
+        PageRankService.calculateIteration(graph);
+        double pv1 = rankedMedia1.getPageRankValue();
+        double pv2 = rankedMedia2.getPageRankValue();
+        int edgesCount = graph.edgeSet().size();
+
+        graph.addEdge(rankedMedia1, rankedMedia2);
+        PageRankService.calculateIteration(graph);
+        assertEquals(pv1, rankedMedia1.getPageRankValue()); // checking pagerank value didnt change
+        assertEquals(pv2, rankedMedia2.getPageRankValue());
+
+        assertEquals(edgesCount, graph.edgeSet().size()); // checking edges count didnt change
     }
 }

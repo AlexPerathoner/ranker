@@ -10,6 +10,7 @@ import java.util.List;
 public class AnilistService {
 
     // todo: suzu implementa sta roba
+    // todo: graphql request to anilist
     public List<Media> retrieveCompletedMedia(String username) {
         return new ArrayList<>();
     }
