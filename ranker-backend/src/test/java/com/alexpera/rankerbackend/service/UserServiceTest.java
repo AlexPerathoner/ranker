@@ -28,12 +28,10 @@ public class UserServiceTest {
     UsersMediaRepository usersMediaRepository;
     @Mock
     AnilistService anilistService;
-    @Mock
-    RankerService rankerService;
 
     @BeforeEach
     void setup() {
-        userService = new UserService(edgeRepository, mediaRepository, usersMediaRepository, anilistService, rankerService);
+        userService = new UserService(edgeRepository, mediaRepository, usersMediaRepository, anilistService);
     }
 
     private final static String USER = "Piede";

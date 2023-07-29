@@ -86,10 +86,6 @@ public class RankerService {
         return Set.of(minItem, midItem);
     }
 
-    public void saveMediaToDB(List<Media> items) {
-        mediaRepository.saveAll(items);
-    }
-
     private void saveMediaOfUser(String username) { // todo should get called before shutdown
         User user = userRepository.findById(username);
         getGraph(username).vertexSet().forEach(media -> {

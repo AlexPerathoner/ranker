@@ -28,15 +28,12 @@ public class UserService {
     UsersMediaRepository usersMediaRepository;
     @Autowired
     AnilistService anilistService;
-    @Autowired
-    RankerService rankerService;
 
-    public UserService(EdgeRepository edgeRepository, MediaRepository mediaRepository, UsersMediaRepository usersMediaRepository, AnilistService anilistService, RankerService rankerService) {
+    public UserService(EdgeRepository edgeRepository, MediaRepository mediaRepository, UsersMediaRepository usersMediaRepository, AnilistService anilistService) {
         this.edgeRepository = edgeRepository;
         this.mediaRepository = mediaRepository;
         this.usersMediaRepository = usersMediaRepository;
         this.anilistService = anilistService;
-        this.rankerService = rankerService;
     }
 
     @Getter
@@ -106,11 +103,15 @@ public class UserService {
                         graph.addVertex(rankedMedia);
                     }
             );
-            rankerService.saveMediaToDB(anilistItems);
+            saveMediaToDB(anilistItems);
         }
 
         if (newItemsFound.get()) {
             PageRankService.resetPageRankToInitialValue(graph);
         }
+    }
+
+    private void saveMediaToDB(List<Media> items) {
+        mediaRepository.saveAll(items);
     }
 }
