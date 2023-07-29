@@ -3,7 +3,6 @@ package com.alexpera.rankerbackend.service;
 import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
 import com.alexpera.rankerbackend.model.anilist.VotedMedia;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

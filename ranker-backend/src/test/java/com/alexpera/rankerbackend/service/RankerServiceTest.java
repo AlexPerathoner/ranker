@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static com.alexpera.rankerbackend.CommonMethods.createMedia;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -43,11 +44,7 @@ public class RankerServiceTest {
     }
 
     private final static String USER = "Piede";
-    private Media createMedia(Long id) {
-        return Media.builder()
-                .id(id)
-                .build();
-    }
+
     RankedMedia rankedMedia1 = createMedia(1L).toRankedMedia(1.0);
     RankedMedia rankedMedia2 = createMedia(2L).toRankedMedia(2.0);
 

@@ -4,7 +4,6 @@ import com.alexpera.rankerbackend.dao.model.Media;
 import com.alexpera.rankerbackend.dao.repo.EdgeRepository;
 import com.alexpera.rankerbackend.dao.repo.MediaRepository;
 import com.alexpera.rankerbackend.dao.repo.UsersMediaRepository;
-import com.alexpera.rankerbackend.model.anilist.EdgeGraph;
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
 import lombok.Getter;
 import org.jgrapht.Graph;

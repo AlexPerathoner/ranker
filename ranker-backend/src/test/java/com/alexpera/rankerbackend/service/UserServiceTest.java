@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 
+import static com.alexpera.rankerbackend.CommonMethods.createMedia;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +32,7 @@ public class UserServiceTest {
     RankerService rankerService;
 
     @BeforeEach
-    void setUp() {
+    void setup() {
         userService = new UserService(edgeRepository, mediaRepository, usersMediaRepository, anilistService, rankerService);
     }
 
@@ -39,11 +40,6 @@ public class UserServiceTest {
     private final static Media MEDIA = Media.builder()
             .id(416L)
             .build();
-    private Media createMedia(Long id) {
-        return Media.builder()
-                .id(id)
-                .build();
-    }
 
     @Test
     void loadUserTest() {

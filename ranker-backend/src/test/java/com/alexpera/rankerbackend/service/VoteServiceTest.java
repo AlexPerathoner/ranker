@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static com.alexpera.rankerbackend.CommonMethods.createMedia;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -23,17 +24,11 @@ public class VoteServiceTest {
     RankerService rankerService;
 
     @BeforeEach
-    void setUp() {
+    void setup() {
         voteService = new VoteService(rankerService);
     }
 
     private final static String USER = "Piede";
-
-    private Media createMedia(Long id) {
-        return Media.builder()
-                .id(id)
-                .build();
-    }
 
     @Test
     void getItemsVoted() {
@@ -93,4 +88,5 @@ public class VoteServiceTest {
         assertEquals(4, result.get(1).getVote());
         assertEquals(6, result.get(2).getVote());
     }
+    // todo test with ~10 items and normal distribution
 }
