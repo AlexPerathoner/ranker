@@ -7,6 +7,7 @@ import com.alexpera.rankerbackend.model.anilist.EdgeGraph;
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
 import com.alexpera.rankerbackend.model.anilist.VotedMedia;
 import com.alexpera.rankerbackend.service.PageRankService;
+import com.alexpera.rankerbackend.service.VoteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.jgrapht.graph.DefaultEdge;
@@ -30,6 +31,9 @@ public class PageRankController {
 
     @Autowired
     PageRankService pageRankService;
+
+    @Autowired
+    VoteService voteService;
 
     @GetMapping("/load-user")
     public ResponseEntity<Set<DefaultEdge>> loadUser(@RequestParam String username) {
@@ -66,7 +70,7 @@ public class PageRankController {
 
     @GetMapping("/get-items-ranked")
     public ResponseEntity<List<VotedMedia>> getItemsRanked(@RequestParam String username) {
-        return ResponseEntity.ok().body(pageRankService.getItemsVotedAsc(username, DistributionFunction.LINEAR, 0, 10));
+        return ResponseEntity.ok().body(voteService.getItemsVotedAsc(username, DistributionFunction.LINEAR, 0, 10));
     }
 
     @GetMapping("/get-next-comparison")

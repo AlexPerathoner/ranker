@@ -10,11 +10,8 @@ import com.alexpera.rankerbackend.dao.repo.UserRepository;
 import com.alexpera.rankerbackend.dao.repo.UsersMediaRepository;
 import com.alexpera.rankerbackend.exceptions.EmptyGraphException;
 import com.alexpera.rankerbackend.exceptions.LoopException;
-import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
 import com.alexpera.rankerbackend.model.anilist.EdgeGraph;
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
-import com.alexpera.rankerbackend.model.anilist.VotedMedia;
-import jakarta.persistence.EmbeddedId;
 import lombok.Getter;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -76,19 +73,24 @@ public class PageRankService {
     }
 
     public void calculateIteration(String username) {
-//        HashMap<RankedMedia, Double> newValues = new HashMap<>();
-//        for (Media item : getGraph(username).vertexSet()) {
-//            double sum = 0;
-//            for (DefaultEdge edge : getGraph(username).incomingEdgesOf(item)) {
-//                Media other = getGraph(username).getEdgeSource(edge);
-//                sum += other.getPageRankValue() / getGraph(username).outDegreeOf(other);
-//            }
-//            newValues.put(item, (1 - DAMPING_FACTOR) / getGraph(username).vertexSet().size() + DAMPING_FACTOR * sum);
-//        }
-//
-//        for (Media item : getGraph(username).vertexSet()) {
-//            item.setPageRankValue(newValues.get(item));
-//        }
+        HashMap<RankedMedia, Double> newValues = new HashMap<>();
+        Graph<RankedMedia, DefaultEdge> userGraph = getGraph(username);
+        for (RankedMedia item : userGraph.vertexSet()) {
+            newValues.put(item, calculatePageRankOfMedia(userGraph, newValues, item));
+        }
+
+        for (RankedMedia item : userGraph.vertexSet()) {
+            item.setPageRankValue(newValues.get(item));
+        }
+    }
+
+    private double calculatePageRankOfMedia(Graph<RankedMedia, DefaultEdge> userGraph, HashMap<RankedMedia, Double> pageRankValues, RankedMedia vertex) {
+        AtomicReference<Double> accumulator = new AtomicReference<>(0.0);
+        userGraph.incomingEdgesOf(vertex).forEach(edge -> {
+            RankedMedia node = userGraph.getEdgeSource(edge);
+            accumulator.set(accumulator.get() + pageRankValues.get(node) / userGraph.outgoingEdgesOf(node).size());
+        });
+        return (1 - DAMPING_FACTOR) / userGraph.vertexSet().size() + accumulator.get() * DAMPING_FACTOR;
     }
 
     public Set<RankedMedia> getItems(String username) {
@@ -97,23 +99,6 @@ public class PageRankService {
 
     public List<RankedMedia> getItemsSorted(String username) {
         return getGraph(username).vertexSet().stream().sorted().toList();
-    }
-
-    public List<VotedMedia> getItemsVotedAsc(String username, DistributionFunction distribution, double min, double max) {
-        List<RankedMedia> items = getItemsSorted(username);
-        List<VotedMedia> votedItems = new ArrayList<>();
-        for (RankedMedia item : items) {
-            double vote;
-            if (distribution == DistributionFunction.LINEAR) {
-                vote = (items.indexOf(item) / (double) (items.size()-1)) * (max - min) + min;
-            } else if (distribution == DistributionFunction.NORMAL) {
-                vote = Math.pow(2, -items.indexOf(item)); // todo implement this, add test
-            } else {
-                throw new IllegalArgumentException("Unknown distribution function");
-            }
-            votedItems.add(item.toVotedMedia(vote));
-        }
-        return votedItems.stream().sorted(Comparator.comparingDouble(VotedMedia::getVote)).toList();
     }
 
     public Set<Media> getNextComparison(String username) throws EmptyGraphException {
