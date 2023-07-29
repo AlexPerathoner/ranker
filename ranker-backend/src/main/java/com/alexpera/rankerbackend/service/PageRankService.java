@@ -1,6 +1,7 @@
 package com.alexpera.rankerbackend.service;
 
 import com.alexpera.rankerbackend.dao.model.Media;
+import com.alexpera.rankerbackend.dao.model.User;
 import com.alexpera.rankerbackend.dao.model.UsersMedia;
 import com.alexpera.rankerbackend.dao.model.UsersMediaId;
 import com.alexpera.rankerbackend.dao.repo.EdgeRepository;
@@ -13,6 +14,7 @@ import com.alexpera.rankerbackend.model.anilist.DistributionFunction;
 import com.alexpera.rankerbackend.model.anilist.EdgeGraph;
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
 import com.alexpera.rankerbackend.model.anilist.VotedMedia;
+import jakarta.persistence.EmbeddedId;
 import lombok.Getter;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -21,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+
 // todo add logs for every method
 @Component
 public class PageRankService {
@@ -109,7 +113,7 @@ public class PageRankService {
             }
             votedItems.add(item.toVotedMedia(vote));
         }
-        return votedItems.stream().sorted((a, b) -> Double.compare(a.getVote(), b.getVote())).toList();
+        return votedItems.stream().sorted(Comparator.comparingDouble(VotedMedia::getVote)).toList();
     }
 
     public Set<Media> getNextComparison(String username) throws EmptyGraphException {
@@ -172,26 +176,43 @@ public class PageRankService {
                     graph.addVertex(rankedMedia);
                 }
         );
+        AtomicReference<Boolean> newItemsFound = new AtomicReference<>(true);
         if (mergeAnilist) {
             List<Media> anilistItems = anilistService.retrieveCompletedMedia(username);
-            // todo check if new items are in anilistItems, which weren't already in the db
-            // if so add them:
+
             anilistItems.forEach(
                     media -> {
                         RankedMedia rankedMedia = media.toRankedMedia();
+                        if(!newItemsFound.get() && mediaRepository.findById(rankedMedia.getId()).isPresent()) {
+                            newItemsFound.set(true);
+                        }
                         graph.addVertex(rankedMedia);
                     }
             );
-            // todo remember to save the new items to the db, refactor this
+            saveMediaToDB(anilistItems);
         }
-        // todo if there are new items, reset pagerankvalue for all items to 1/n
+
+        if (newItemsFound.get()) {
+            resetPageRankToInitialValue(graph);
+        }
+    }
+
+    private void saveMediaToDB(List<Media> items) {
+        mediaRepository.saveAll(items);
+    }
+
+    private void saveMediaOfUser(String username) { // todo should get called before shutdown
+        User user = userRepository.findById(username);
+        usersGraph.get(username).vertexSet().forEach(media -> {
+            UsersMediaId id = new UsersMediaId(user.getId(), media.getId());
+            usersMediaRepository.save(new UsersMedia(id, user, media, media.getPageRankValue()));
+        });
 
     }
 
-    public void savePageRankValues(String username) {
-        Graph<RankedMedia, DefaultEdge> graph = usersGraph.get(username);
-        for (RankedMedia media : graph.vertexSet()) {
-            usersMediaRepository.save(new UsersMedia(new UsersMediaId(username, media.getId()), userRepository.findById(username), media, media.getPageRankValue()));
-        }
+    private void resetPageRankToInitialValue(Graph<RankedMedia, DefaultEdge> graph) {
+        double countVertex = (double) graph.vertexSet().size();
+        graph.vertexSet().forEach(v -> v.setPageRankValue(1/countVertex));
     }
+
 }
