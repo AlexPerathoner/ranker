@@ -43,9 +43,6 @@ public class RankerServiceTest {
     }
 
     private final static String USER = "Piede";
-    private final static Media MEDIA = Media.builder()
-            .id(416L)
-            .build();
     private Media createMedia(Long id) {
         return Media.builder()
                 .id(id)
