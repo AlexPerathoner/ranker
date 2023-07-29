@@ -20,11 +20,11 @@ public class VoteServiceTest {
     VoteService voteService;
 
     @Mock
-    PageRankService pageRankService;
+    RankerService rankerService;
 
     @BeforeEach
     void setUp() {
-        voteService = new VoteService(pageRankService);
+        voteService = new VoteService(rankerService);
     }
 
     private final static String USER = "Piede";
@@ -40,7 +40,7 @@ public class VoteServiceTest {
         RankedMedia rankedMedia1 = createMedia(1L).toRankedMedia(0.4);
         RankedMedia rankedMedia2 = createMedia(2L).toRankedMedia(0.5);
         RankedMedia rankedMedia3 = createMedia(3L).toRankedMedia(1.0);
-        when(pageRankService.getItemsSorted(USER)).thenReturn(List.of(rankedMedia1, rankedMedia2, rankedMedia3));
+        when(rankerService.getItemsSorted(USER)).thenReturn(List.of(rankedMedia1, rankedMedia2, rankedMedia3));
         List<VotedMedia> result = voteService.getItemsVotedAsc(USER, DistributionFunction.LINEAR, 0, 10);
         assertEquals(3, result.size());
         // check order
@@ -58,7 +58,7 @@ public class VoteServiceTest {
         RankedMedia rankedMedia1 = createMedia(1L).toRankedMedia(0.4);
         RankedMedia rankedMedia2 = createMedia(2L).toRankedMedia(0.5);
         RankedMedia rankedMedia3 = createMedia(3L).toRankedMedia(1.0);
-        when(pageRankService.getItemsSorted(USER)).thenReturn(List.of(rankedMedia1, rankedMedia2, rankedMedia3));
+        when(rankerService.getItemsSorted(USER)).thenReturn(List.of(rankedMedia1, rankedMedia2, rankedMedia3));
 
         List<VotedMedia> result = voteService.getItemsVotedAsc(USER, DistributionFunction.LINEAR, 5, 10);
 
@@ -72,7 +72,7 @@ public class VoteServiceTest {
         RankedMedia rankedMedia1 = createMedia(1L).toRankedMedia(0.4);
         RankedMedia rankedMedia2 = createMedia(2L).toRankedMedia(0.5);
         RankedMedia rankedMedia3 = createMedia(3L).toRankedMedia(1.0);
-        when(pageRankService.getItemsSorted(USER)).thenReturn(List.of(rankedMedia1, rankedMedia2, rankedMedia3));
+        when(rankerService.getItemsSorted(USER)).thenReturn(List.of(rankedMedia1, rankedMedia2, rankedMedia3));
         List<VotedMedia> result = voteService.getItemsVotedAsc(USER, DistributionFunction.LINEAR, 0, 6);
 
         // check values
@@ -85,7 +85,7 @@ public class VoteServiceTest {
         RankedMedia rankedMedia1 = createMedia(1L).toRankedMedia(0.4);
         RankedMedia rankedMedia2 = createMedia(2L).toRankedMedia(0.5);
         RankedMedia rankedMedia3 = createMedia(3L).toRankedMedia(1.0);
-        when(pageRankService.getItemsSorted(USER)).thenReturn(List.of(rankedMedia1, rankedMedia2, rankedMedia3));
+        when(rankerService.getItemsSorted(USER)).thenReturn(List.of(rankedMedia1, rankedMedia2, rankedMedia3));
         List<VotedMedia> result = voteService.getItemsVotedAsc(USER, DistributionFunction.LINEAR, 2, 6);
 
         // check values

@@ -15,14 +15,14 @@ import java.util.List;
 public class VoteService {
 
     @Autowired
-    PageRankService pageRankService;
+    RankerService rankerService;
 
-    public VoteService(PageRankService pageRankService) {
-        this.pageRankService = pageRankService;
+    public VoteService(RankerService rankerService) {
+        this.rankerService = rankerService;
     }
 
     public List<VotedMedia> getItemsVotedAsc(String username, DistributionFunction distribution, double min, double max) {
-        List<RankedMedia> items = pageRankService.getItemsSorted(username);
+        List<RankedMedia> items = rankerService.getItemsSorted(username);
         List<VotedMedia> votedItems = new ArrayList<>();
         for (RankedMedia item : items) {
             double vote;

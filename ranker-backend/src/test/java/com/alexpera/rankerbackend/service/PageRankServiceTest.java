@@ -38,7 +38,7 @@ class PageRankServiceTest {
 
     @BeforeEach
     void setUp() {
-        pageRankService = new PageRankService(userRepository, usersMediaRepository, edgeRepository, mediaRepository, anilistService);
+        pageRankService = new PageRankService();
     }
 
     private final static String USER = "Piede";
@@ -51,67 +51,6 @@ class PageRankServiceTest {
                 .build();
     }
 
-    @Test
-    void loadUserTest() {
-        ArrayList<Media> mediaList = new ArrayList<>();
-        mediaList.add(MEDIA);
-        when(anilistService.retrieveCompletedMedia(USER)).thenReturn(mediaList);
-        pageRankService.loadUser(USER);
-        assertTrue(pageRankService.getItems(USER).contains(MEDIA.toRankedMedia()));
-    }
-
-    @Test
-    void addVertexTest() {
-        RankedMedia rankedMedia = MEDIA.toRankedMedia();
-        pageRankService.add(USER, rankedMedia);
-        assertTrue(pageRankService.getItems(USER).contains(rankedMedia));
-        assertTrue(pageRankService.getItemsSorted(USER).contains(rankedMedia));
-    }
-
-    @Test
-    void addAllVertexTest() {
-        ArrayList<RankedMedia> rankedMediaList = new ArrayList<>();
-        rankedMediaList.add(createMedia(1L).toRankedMedia());
-        rankedMediaList.add(createMedia(1L).toRankedMedia());
-        pageRankService.addAll(USER, rankedMediaList);
-        assertEquals(1, pageRankService.getItems(USER).size());
-
-        rankedMediaList.add(createMedia(2L).toRankedMedia());
-        pageRankService.addAll(USER, rankedMediaList);
-        assertEquals(2, pageRankService.getItems(USER).size());
-
-        assertTrue(pageRankService.getItems(USER).containsAll(rankedMediaList));
-    }
-    @Test
-    void getItemsSorted() {
-        RankedMedia rankedMedia1 = createMedia(1L).toRankedMedia(1.0);
-        RankedMedia rankedMedia2 = createMedia(2L).toRankedMedia(2.0);
-        pageRankService.add(USER, rankedMedia1);
-        pageRankService.add(USER, rankedMedia2);
-        assertEquals(2, pageRankService.getItems(USER).size());
-
-        assertEquals(pageRankService.getItemsSorted(USER).get(0), rankedMedia1);
-        assertEquals(pageRankService.getItemsSorted(USER).get(1), rankedMedia2);
-    }
-
-    @Test
-    void addEdgeTest() {
-        RankedMedia rankedMedia1 = createMedia(1L).toRankedMedia();
-        RankedMedia rankedMedia2 = createMedia(2L).toRankedMedia();
-        pageRankService.add(USER, rankedMedia1);
-        pageRankService.add(USER, rankedMedia2);
-        pageRankService.addLink(USER, rankedMedia1, rankedMedia2);
-        assertEquals(pageRankService.getEdges(USER).stream().toList().get(0).getSource(), rankedMedia1);
-        assertEquals(pageRankService.getEdges(USER).stream().toList().get(0).getTarget(), rankedMedia2);
-    }
-
-    @Test
-    void addLinkOnSameVertex() {
-        RankedMedia rankedMedia1 = createMedia(1L).toRankedMedia();
-        pageRankService.add(USER, rankedMedia1);
-        
-        assertThrows(LoopException.class, () -> pageRankService.addLink(USER, rankedMedia1, rankedMedia1));
-    }
 
 
     // todo test with ~10 items and normal distribution

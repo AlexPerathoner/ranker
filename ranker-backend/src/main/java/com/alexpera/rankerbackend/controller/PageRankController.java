@@ -7,6 +7,8 @@ import com.alexpera.rankerbackend.model.anilist.EdgeGraph;
 import com.alexpera.rankerbackend.model.anilist.RankedMedia;
 import com.alexpera.rankerbackend.model.anilist.VotedMedia;
 import com.alexpera.rankerbackend.service.PageRankService;
+import com.alexpera.rankerbackend.service.RankerService;
+import com.alexpera.rankerbackend.service.UserService;
 import com.alexpera.rankerbackend.service.VoteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
@@ -30,14 +32,18 @@ public class PageRankController {
     UserRepository userRepository;
 
     @Autowired
-    PageRankService pageRankService;
+    RankerService rankerService;
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     VoteService voteService;
 
+
     @GetMapping("/load-user")
     public ResponseEntity<Set<DefaultEdge>> loadUser(@RequestParam String username) {
-        return ResponseEntity.ok().body(pageRankService.loadUser(username));
+        return ResponseEntity.ok().body(userService.loadUser(username));
     }
 
     @GetMapping("/test-repo")
@@ -53,13 +59,13 @@ public class PageRankController {
         ObjectMapper mapper = new ObjectMapper();
         RankedMedia[] anilistMedias = mapper.readValue(file, RankedMedia[].class);
         ArrayList<RankedMedia> anilistMediaArrayList = new ArrayList<>(Arrays.asList(anilistMedias));
-        pageRankService.addAll(username, anilistMediaArrayList);
+        userService.addAll(username, anilistMediaArrayList);
         return ResponseEntity.ok().body("File loaded");
     }
 
     @GetMapping("/get-items-sorted")
     public ResponseEntity<List<RankedMedia>> getItemsSorted(@RequestParam String username) {
-        return ResponseEntity.ok().body(pageRankService.getItemsSorted(username));
+        return ResponseEntity.ok().body(rankerService.getItemsSorted(username));
     }
 
     @GetMapping("/load-series")
@@ -75,44 +81,45 @@ public class PageRankController {
 
     @GetMapping("/get-next-comparison")
     public ResponseEntity<Set<Media>> getNextComparison(@RequestParam String username) {
-        return ResponseEntity.ok().body(pageRankService.getNextComparison(username));
+        return ResponseEntity.ok().body(rankerService.getNextComparison(username));
     }
 
     @GetMapping("/add-link")
     public ResponseEntity<String> addLink(@RequestParam String username, @RequestParam long betterId, @RequestParam long worseId) {
-        Set<RankedMedia> items = pageRankService.getItems(username);
+        Set<RankedMedia> items = userService.getItems(username);
         RankedMedia better = items.stream().filter(item -> item.getId() == betterId).findFirst().orElse(null);
         RankedMedia worse = items.stream().filter(item -> item.getId() == worseId).findFirst().orElse(null);
         if (better == null || worse == null) {
             return ResponseEntity.badRequest().body("Invalid id");
         }
-        pageRankService.addLink(username, worse, better);
+        rankerService.addLink(username, worse, better);
         return ResponseEntity.ok().body("Link added");
     }
 
     @GetMapping("/calculate-iteration")
     public ResponseEntity<List<RankedMedia>> calculateIteration(@RequestParam String username) {
-        pageRankService.calculateIteration(username);
-        return ResponseEntity.ok().body(pageRankService.getItemsSorted(username));
+        PageRankService.calculateIteration(userService.getGraph(username)); // todo remove, only for debug purpose - should be done by job
+        return ResponseEntity.ok().body(rankerService.getItemsSorted(username));
     }
 
     @GetMapping("/save")
     public ResponseEntity<String> save(@RequestParam String username) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(new File("completedSeries-"+ new Date().getTime() +".json"), pageRankService.getItemsSorted(username));
+        mapper.writeValue(new File("completedSeries-"+ new Date().getTime() +".json"), rankerService.getItemsSorted(username));
         return ResponseEntity.ok().body("Saved");
     }
 
     @GetMapping("/edges-id")
     public ResponseEntity<List<EdgeGraph<Long>>> edgesId(@RequestParam String username) {
-        List<EdgeGraph<RankedMedia>> edges = pageRankService.getEdges(username).stream().toList();
+        List<EdgeGraph<RankedMedia>> edges = rankerService
+                .getEdges(username).stream().toList();
 
         List<EdgeGraph<Long>> edgesId = edges.stream().map(edge -> new EdgeGraph<>(edge.getSource().getId(), edge.getTarget().getId())).toList();
         return ResponseEntity.ok().body(edgesId);
     }
     @GetMapping("/edges")
     public ResponseEntity<List<EdgeGraph<RankedMedia>>> edges(@RequestParam String username) {
-        List<EdgeGraph<RankedMedia>> edges = pageRankService.getEdges(username).stream().toList();
+        List<EdgeGraph<RankedMedia>> edges = rankerService.getEdges(username).stream().toList();
 
         return ResponseEntity.ok().body(edges);
     }
